@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% set use_container_fluid = True %}
+{% set hide_footer = True %}
+
+{% block stylesheets %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='edit.css') }}">
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-4 col-md-3 col-lg-2 d-none d-sm-block bg-light sidebar">
+    <div class="node-list">
+      <div class="node node-sample">
+        <span>Image Matching</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-8 ml-sm-auto col-md-9 col-lg-10">
+    <h1>Workflow Editor</h1>
+
+    <div class="canvas">
+      <div class="flow">
+        <div class="node node-start">
+          <span>Start</span>
+        </div>
+
+        <div class="node node-end">
+          <span>End</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5sortable/0.6.3/html.sortable.min.js"></script>
+<script src="{{ url_for('static', filename='edit.js') }}"></script>
+
+{% endblock %}

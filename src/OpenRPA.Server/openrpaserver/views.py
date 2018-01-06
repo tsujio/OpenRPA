@@ -37,3 +37,13 @@ def about():
         title='About',
         year=datetime.now().year,
     )
+
+
+@app.route('/edit')
+def edit():
+    """Workflow edit page."""
+    return render_template(
+        'edit.html',
+        title='Edit',
+        year=datetime.now().year,
+    )

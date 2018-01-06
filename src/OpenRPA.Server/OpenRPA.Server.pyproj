@@ -18,6 +18,7 @@
     <Name>openrpaserver</Name>
     <RootNamespace>openrpaserver</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <Environment>FLASK_DEBUG=1</Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,7 +39,10 @@
     <Folder Include="openrpaserver\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="openrpaserver\static\edit.css" />
+    <Content Include="openrpaserver\static\edit.js" />
     <Content Include="openrpaserver\static\site.css" />
+    <Content Include="openrpaserver\templates\edit.html" />
     <Content Include="requirements.txt" />
     <Content Include="openrpaserver\templates\about.html" />
     <Content Include="openrpaserver\templates\contact.html" />

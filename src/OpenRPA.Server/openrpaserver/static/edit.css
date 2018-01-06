@@ -1,0 +1,41 @@
+.sidebar {
+    position: fixed;
+    top: 51px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 20px 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-right: 1px solid #eee;
+}
+
+h1 {
+    padding-bottom: 9px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.node {
+    width: 150px;
+    height: 60px;
+    background: #eeeeef;
+    border: 1px solid #346789;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0.8em;
+}
+
+.canvas .node {
+    margin-top: 20px;
+}
+
+.canvas {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background: #fafafa;
+    padding: 20px 60px;
+    border: 1px solid lightgray;
+}

@@ -6,6 +6,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}">
+    {% block stylesheets %}{% endblock %}
 
     <title>{{ title }} - OpenRPA</title>
   </head>
@@ -36,12 +37,15 @@
       </div>
     </nav>
 
-    <main role="main" class="container">
+    <main role="main" class="{{ 'container-fluid' if use_container_fluid else 'container' }}">
       {% block content %}{% endblock %}
-      <hr />
-      <footer>
-        <p>&copy; {{ year }} - OpenRPA</p>
-      </footer>
+
+      {% if not hide_footer %}
+        <hr />
+        <footer>
+          <p>&copy; {{ year }} - OpenRPA</p>
+        </footer>
+      {% endif %}
     </main>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
