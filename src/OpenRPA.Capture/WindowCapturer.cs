@@ -1,6 +1,7 @@
 ﻿using OpenRPA.Windows;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,14 @@ namespace OpenRPA.Capture
             sender.Stop();
 
             System.Diagnostics.Debug.WriteLine($"{x}, {y}");
+
+            WindowModel w = WindowModel.FindByPosition(x, y);
+            Bitmap bmp = w.CaptureWindow();
+
+            bmp.Save(System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                "OpenRPA-Capture.bmp"
+            ));
 
             Finish();
         }
