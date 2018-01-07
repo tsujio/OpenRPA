@@ -44,18 +44,32 @@ namespace OpenRPA.Client
             option = m.Groups[3].Value.TrimStart('/');
         }
 
+        private Action commandAction;
+
         private void Dispatch(string schema, string command, string option)
         {
             switch (command)
             {
                 case "capture":
                     var w = new WindowCapturer();
-                    w.CaptureAndSend();
+
+                    // Wrap object by function not to garbage collected
+                    commandAction = () =>
+                    {
+                        w.Finish += () =>
+                        {
+                            this.Close();
+                        };
+
+                        w.CaptureAndSend();
+                    };
                     break;
 
                 default:
                     throw new NotSupportedException($"Command '{command}' not supported");
             }
+
+            commandAction();
         }
     }
 }

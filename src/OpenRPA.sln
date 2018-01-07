@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRPA.Client", "OpenRPA.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRPA.Capture", "OpenRPA.Capture\OpenRPA.Capture.csproj", "{51D25789-7CEE-474D-96D2-48E1D0EB5D3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRPA.Windows", "OpenRPA.Windows\OpenRPA.Windows.csproj", "{9F158B4D-7E55-472E-B50C-50241B0C838A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{51D25789-7CEE-474D-96D2-48E1D0EB5D3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51D25789-7CEE-474D-96D2-48E1D0EB5D3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51D25789-7CEE-474D-96D2-48E1D0EB5D3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F158B4D-7E55-472E-B50C-50241B0C838A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F158B4D-7E55-472E-B50C-50241B0C838A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F158B4D-7E55-472E-B50C-50241B0C838A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F158B4D-7E55-472E-B50C-50241B0C838A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
