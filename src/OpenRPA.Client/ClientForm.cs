@@ -51,7 +51,14 @@ namespace OpenRPA.Client
             switch (command)
             {
                 case "capture":
-                    var w = new WindowCapturer();
+                    DialogResult result = MessageBox.Show("This application sends screenshot to server.\n\nContinue?", "Warning", MessageBoxButtons.YesNo);
+                    if (result != DialogResult.Yes)
+                    {
+                        this.Close();
+                        return;
+                    }
+
+                    var w = new WindowCapturer(option);
 
                     // Wrap object by function not to garbage collected
                     commandAction = () =>
