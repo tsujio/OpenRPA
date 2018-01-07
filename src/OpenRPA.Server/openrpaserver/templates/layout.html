@@ -37,7 +37,7 @@
       </div>
     </nav>
 
-    <main role="main" class="{{ 'container-fluid' if use_container_fluid else 'container' }}">
+    <main role="main" class="{{ '' if no_container else 'container' }}">
       {% block content %}{% endblock %}
 
       {% if not hide_footer %}

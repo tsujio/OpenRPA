@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% set use_container_fluid = True %}
+{% set no_container = True %}
 {% set hide_footer = True %}
 
 {% block stylesheets %}
@@ -11,16 +11,16 @@
 
 {% block content %}
 
-<div class="row">
-  <div class="col-sm-4 col-md-3 col-lg-2 d-none d-sm-block bg-light sidebar">
+<div>
+  <div class="sidebar">
     <div class="node-list">
-      <div class="node node-sample">
+      <div class="node node-image-matching">
         <span>Image Matching</span>
       </div>
     </div>
   </div>
 
-  <div class="col-sm-8 ml-sm-auto col-md-9 col-lg-10">
+  <div class="canvas-panel">
     <h1>Workflow Editor</h1>
 
     <div class="canvas">
@@ -35,11 +35,29 @@
       </div>
     </div>
   </div>
+
+  <div class="node-property-panel">
+  </div>
 </div>
+
+<script type="text/template" id="tmplImageMatchingNodeProperty">
+  <div class="image-matching-node-property">
+    <input type="text" class="name" placeholder="Node name" value="<%= name %>" />
+
+    <button type="button" class="capture">Capture</button>
+
+    <select class="action">
+      <option value="lclick">Left Click</option>
+    </select>
+  </div>
+</script>
 
 {% endblock %}
 
 {% block scripts %}
+
+<!-- Just for html template -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5sortable/0.6.3/html.sortable.min.js"></script>
 <script src="{{ url_for('static', filename='edit.js') }}"></script>
