@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "OpenRPA.Server", "OpenRPA.Server\OpenRPA.Server.pyproj", "{1A15868D-B0F3-41B5-9230-5A06F3B9C1B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRPA.Client", "OpenRPA.Client\OpenRPA.Client.csproj", "{114214E3-AB1D-452B-BD6F-DF6C9C36EA24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1A15868D-B0F3-41B5-9230-5A06F3B9C1B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A15868D-B0F3-41B5-9230-5A06F3B9C1B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A15868D-B0F3-41B5-9230-5A06F3B9C1B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{114214E3-AB1D-452B-BD6F-DF6C9C36EA24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{114214E3-AB1D-452B-BD6F-DF6C9C36EA24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{114214E3-AB1D-452B-BD6F-DF6C9C36EA24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{114214E3-AB1D-452B-BD6F-DF6C9C36EA24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
