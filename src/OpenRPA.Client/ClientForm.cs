@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OpenRPA.Capture;
 
 namespace OpenRPA.Client
 {
@@ -47,6 +48,11 @@ namespace OpenRPA.Client
         {
             switch (command)
             {
+                case "capture":
+                    var w = new WindowCapturer();
+                    w.CaptureAndSend();
+                    break;
+
                 default:
                     throw new NotSupportedException($"Command '{command}' not supported");
             }

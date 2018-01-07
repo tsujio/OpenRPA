@@ -78,5 +78,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenRPA.Capture\OpenRPA.Capture.csproj">
+      <Project>{51D25789-7CEE-474D-96D2-48E1D0EB5D3C}</Project>
+      <Name>OpenRPA.Capture</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
