@@ -14,6 +14,8 @@ namespace OpenRPA.Client
 {
     public partial class ClientForm : Form
     {
+        private bool hasBeenCommandExecuted = false;
+
         public ClientForm()
         {
             InitializeComponent();
@@ -22,6 +24,13 @@ namespace OpenRPA.Client
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            // Command is executed only once
+            if (hasBeenCommandExecuted)
+            {
+                return;
+            }
+            hasBeenCommandExecuted = true;
 
             ParseArgs(out string schema, out string command, out string option);
 
@@ -62,21 +71,9 @@ namespace OpenRPA.Client
 
         private void DoCaptureCommand(string schema, string command, string option)
         {
-            DialogResult result = MessageBox.Show("This application sends screenshot to server.\n\nContinue?", "Warning", MessageBoxButtons.YesNo);
-            if (result != DialogResult.Yes)
-            {
-                this.Close();
-                return;
-            }
-
             string captureImageUploadUrl = ConfigurationManager.AppSettings["captureImageUploadUrl"];
 
             var w = new WindowCapturer(captureImageUploadUrl, option);
-
-            if (commandAction != null)
-            {
-                throw new Exception("Something wrong");
-            }
 
             // Wrap object by function not to garbage collected
             commandAction = () =>
