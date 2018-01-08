@@ -55,10 +55,75 @@ $(() => {
       var blob = new Blob([msg.data], {type: 'image/png'});
       var url = URL.createObjectURL(blob);
 
-      // debug
-      var img = $("<img>");
-      img.attr('src', url);
-      $('.canvas-panel').append(img);
+      $('.capture-image').attr('src', url);
+
+      var canvas = document.querySelector('.capture-image-modal .capture-image-canvas');
+      var ctx = canvas.getContext('2d');
+      var img = new Image();
+      img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        $('.capture-image-modal').modal('show');
+      }
+      img.src = url;
+
+      $('.capture-image').on('click', function(e) {
+        var img = new Image();
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          $('.capture-image-modal').modal('show');
+        }
+        img.src = url;
+      });
+
+      $('.capture-image-modal .modal-body').css('height', $(window).innerHeight() - 100);
+
+      var isMouseDown = false;
+      var startX, startY, endX, endY;
+      $(canvas).on('mousedown', function(e) {
+        isMouseDown = true;
+
+        var rect = e.target.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+
+        ctx.strokeStyle = "#00ff00";
+        ctx.lineWidth = 5;
+        ctx.setLineDash([2, 3]);
+      }).on('mousemove', function(e) {
+        if (!isMouseDown) {
+          return;
+        }
+
+        var rect = e.target.getBoundingClientRect();
+        endX = e.clientX - rect.left;
+        endY = e.clientY - rect.top;
+
+        ctx.drawImage(img, 0, 0);
+
+        ctx.beginPath();
+
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, startY);
+
+        ctx.moveTo(startX,endY);
+        ctx.lineTo(endX,endY);
+
+        ctx.moveTo(endX,startY);
+        ctx.lineTo(endX,endY);
+
+        ctx.moveTo(startX,startY);
+        ctx.lineTo(startX,endY);
+
+        ctx.stroke();
+      }).on('mouseup', function(e) {
+        isMouseDown = false;
+      });
     });
 
     location.href = 'openrpa:capture/' + $(e.currentTarget).attr('data-token');

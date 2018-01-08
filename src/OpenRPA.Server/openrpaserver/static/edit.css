@@ -58,3 +58,11 @@ h1 {
     padding: 20px 10px;
     background: #f3f3f3;
 }
+
+.node-property-panel .capture-image {
+    width: 100%;
+}
+
+.capture-image-modal .modal-body {
+    overflow: scroll;
+}
