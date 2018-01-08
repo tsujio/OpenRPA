@@ -81,10 +81,10 @@ def listen_capture():
     """Handle request for sending uploaded capture image"""
     pubsub = redis.pubsub()
     print('subscribe: ' + 'capture-' + session['session_id'])
-    pubsub.psubscribe(['capture-' + session['session_id']])
+    pubsub.subscribe(['capture-' + session['session_id']])
     for item in pubsub.listen():
         print(item)
-        if item['type'] == 'pmessage':
+        if item['type'] == 'message':
             emit('receive capture', {'data': item['data']})
             pubsub.unsubscribe()
             break
