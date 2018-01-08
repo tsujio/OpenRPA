@@ -14,6 +14,8 @@ namespace OpenRPA.Capture
     {
         public event Action Finish;
 
+        private MouseHook mouseHook;
+
         private string captureImageUploadUrl;
 
         private string uploadToken;
@@ -47,16 +49,19 @@ namespace OpenRPA.Capture
 
         public void CaptureAndSend()
         {
-            var hook = new MouseHook(MouseHook.HookType.LeftClick);
+            // Store MouseHook object to instance field not to be garbage collected.
+            // This instance is referenced by native code (SetWindowsHookEx).
+            // If native code refers GCed object, application will crash.
+            mouseHook = new MouseHook(MouseHook.HookType.LeftClick);
 
-            hook.MouseEvent += OnMouseLeftClickEvent;
+            mouseHook.MouseEvent += OnMouseLeftClickEvent;
 
-            hook.Start();
+            mouseHook.Start();
         }
 
-        private void OnMouseLeftClickEvent(MouseHook sender, int x, int y)
+        private void OnMouseLeftClickEvent(int x, int y)
         {
-            sender.Stop();
+            mouseHook.Stop();
 
             // Capture window at clicked point
             WindowModel w = WindowModel.FindByPosition(x, y);

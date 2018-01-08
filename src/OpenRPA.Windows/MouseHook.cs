@@ -15,7 +15,7 @@ namespace OpenRPA.Windows
             LeftClick,
         }
 
-        public delegate void MouseEventHandler(MouseHook sender, int x, int y);
+        public delegate void MouseEventHandler(int x, int y);
 
         public event MouseEventHandler MouseEvent;
 
@@ -50,7 +50,7 @@ namespace OpenRPA.Windows
                 var hookStruct = (Win32.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam,
                     typeof(Win32.MSLLHOOKSTRUCT));
 
-                MouseEvent(this, hookStruct.pt.x, hookStruct.pt.y);
+                MouseEvent(hookStruct.pt.x, hookStruct.pt.y);
             }
 
             return Win32.CallNextHookEx(hHook, nCode, wParam, lParam);
