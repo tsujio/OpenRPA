@@ -42,7 +42,25 @@ $(() => {
     $('.node-property-panel').html(html);
   }
 
-  $('.node-property-panel').on('click', '.image-matching-node-property .capture', () => {
-    location.href = 'openrpa:capture/abcdefghijklmnopqrstuvwxyz';
+  $('.node-property-panel').on('click', '.image-matching-node-property .capture', (e) => {
+    var socket = io.connect("http://localhost:5555/capture");
+
+    socket.on('connect', function() {
+      console.log('connected.');
+
+      socket.emit('listen capture');
+    });
+
+    socket.on('receive capture', function(msg) {
+      var blob = new Blob([msg.data], {type: 'image/png'});
+      var url = URL.createObjectURL(blob);
+
+      // debug
+      var img = $("<img>");
+      img.attr('src', url);
+      $('.canvas-panel').append(img);
+    });
+
+    location.href = 'openrpa:capture/' + $(e.currentTarget).attr('data-token');
   });
 });

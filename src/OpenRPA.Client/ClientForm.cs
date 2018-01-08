@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -44,37 +45,49 @@ namespace OpenRPA.Client
             option = m.Groups[3].Value.TrimStart('/');
         }
 
-        private Action commandAction;
-
         private void Dispatch(string schema, string command, string option)
         {
             switch (command)
             {
                 case "capture":
-                    DialogResult result = MessageBox.Show("This application sends screenshot to server.\n\nContinue?", "Warning", MessageBoxButtons.YesNo);
-                    if (result != DialogResult.Yes)
-                    {
-                        this.Close();
-                        return;
-                    }
-
-                    var w = new WindowCapturer(option);
-
-                    // Wrap object by function not to garbage collected
-                    commandAction = () =>
-                    {
-                        w.Finish += () =>
-                        {
-                            this.Close();
-                        };
-
-                        w.CaptureAndSend();
-                    };
+                    DoCaptureCommand(schema, command, option);
                     break;
 
                 default:
                     throw new NotSupportedException($"Command '{command}' not supported");
             }
+        }
+
+        private Action commandAction;
+
+        private void DoCaptureCommand(string schema, string command, string option)
+        {
+            DialogResult result = MessageBox.Show("This application sends screenshot to server.\n\nContinue?", "Warning", MessageBoxButtons.YesNo);
+            if (result != DialogResult.Yes)
+            {
+                this.Close();
+                return;
+            }
+
+            string captureImageUploadUrl = ConfigurationManager.AppSettings["captureImageUploadUrl"];
+
+            var w = new WindowCapturer(captureImageUploadUrl, option);
+
+            if (commandAction != null)
+            {
+                throw new Exception("Something wrong");
+            }
+
+            // Wrap object by function not to garbage collected
+            commandAction = () =>
+            {
+                w.Finish += () =>
+                {
+                    this.Close();
+                };
+
+                w.CaptureAndSend();
+            };
 
             commandAction();
         }

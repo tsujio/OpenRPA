@@ -44,7 +44,7 @@
   <div class="image-matching-node-property">
     <input type="text" class="name" placeholder="Node name" value="<%= name %>" />
 
-    <button type="button" class="capture">Capture</button>
+    <button type="button" class="capture" data-token="{{ session['session_id'] }}">Capture</button>
 
     <select class="action">
       <option value="lclick">Left Click</option>
@@ -60,6 +60,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5sortable/0.6.3/html.sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js"></script>
 <script src="{{ url_for('static', filename='edit.js') }}"></script>
 
 {% endblock %}

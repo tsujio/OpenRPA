@@ -14,11 +14,35 @@ namespace OpenRPA.Capture
     {
         public event Action Finish;
 
-        private string sendOption;
+        private string captureImageUploadUrl;
 
-        public WindowCapturer(string sendOption)
+        private string uploadToken;
+
+        public WindowCapturer(string captureImageUploadUrl, string uploadToken)
         {
-            this.sendOption = sendOption;
+            if (String.IsNullOrWhiteSpace(captureImageUploadUrl))
+            {
+                throw new ArgumentException("captureImageUploadUrl not specified");
+            }
+            if (!IsValidUploadToken(uploadToken))
+            {
+                throw new ArgumentException("Invalid uploadToken");
+            }
+
+            this.captureImageUploadUrl = captureImageUploadUrl;
+            this.uploadToken = uploadToken;
+        }
+
+        private bool IsValidUploadToken(string uploadToken)
+        {
+            if (String.IsNullOrEmpty(uploadToken))
+            {
+                return false;
+            }
+
+            var r = new System.Text.RegularExpressions.Regex(@"^[\w-]+$");
+            var m = r.Match(uploadToken);
+            return m.Success;
         }
 
         public void CaptureAndSend()
@@ -38,24 +62,20 @@ namespace OpenRPA.Capture
             WindowModel w = WindowModel.FindByPosition(x, y);
             Bitmap bmp = w.CaptureWindow();
 
-            bmp.Save(System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                "OpenRPA-Capture.bmp"
-            ));
-
             // Send capture image to server
             using (var stream = new MemoryStream())
             {
+                // Make http content object from capture image
                 bmp.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Position = 0;
                 HttpContent content = new StreamContent(stream);
 
                 using (var client = new HttpClient())
                 using (var formData = new MultipartFormDataContent())
                 {
-                    formData.Add(content);
+                    formData.Add(content, "capture", "capture.png");
 
-                    // TODO: Security
-                    var url = "http://localhost:" + this.sendOption;
+                    var url = this.captureImageUploadUrl + "?token=" + this.uploadToken;
 
                     var response = client.PostAsync(url, formData).Result;
                     if (!response.IsSuccessStatusCode)
@@ -63,6 +83,7 @@ namespace OpenRPA.Capture
                         throw new Exception("Sending captured image failed");
                     }
                 }
+
             }
 
             Finish();
