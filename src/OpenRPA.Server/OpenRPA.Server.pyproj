@@ -29,6 +29,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="openrpaserver\config.py" />
     <Compile Include="runserver.py" />
     <Compile Include="openrpaserver\__init__.py" />
     <Compile Include="openrpaserver\views.py" />
