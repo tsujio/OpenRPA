@@ -1,11 +1,41 @@
-{% extends "layout.html" %}
+(% extends "layout.html" %)
 
-{% block content %}
+(% block stylesheets %)
 
-<div class="jumbotron">
+<style>
+ .main {
+   text-align: center;
+   padding: 4rem 0;
+   font-size: 2rem;
+ }
+
+ footer {
+   text-align: center;
+   margin-top: 6rem;
+ }
+</style>
+
+(% endblock %)
+
+(% block content %)
+
+<header class="mdc-toolbar">
+  <div class="mdc-toolbar__row">
+  </div>
+</header>
+
+<div class="main">
   <h1>OpenRPA</h1>
-  <p class="lead">OpenRPA is a free open source <strong>Robotic Process Automation (RPA)</strong> software.</p>
-  <p><a href="{{ url_for('edit') }}" class="btn btn-primary btn-large">Try now &raquo;</a></p>
+
+  <p>A free open source <strong>Robotic Process Automation</strong> software.</p>
+
+  <a href="(( url_for('edit') ))" class="mdc-button mdc-button--raised">Try now</a>
 </div>
 
-{% endblock %}
+<footer>
+  <p>&copy; (( year )) - OpenRPA</p>
+
+  <p>Developed by Naoki Tsujio on <a href="https://github.com/tsujio/OpenRPA">GitHub</a></p>
+</footer>
+
+(% endblock %)

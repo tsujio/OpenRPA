@@ -38,15 +38,21 @@
     <Folder Include="openrpaserver\" />
     <Folder Include="openrpaserver\static\" />
     <Folder Include="openrpaserver\templates\" />
+    <Folder Include="openrpaserver\templates\components\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="openrpaserver\static\edit.css" />
     <Content Include="openrpaserver\static\edit.js" />
-    <Content Include="openrpaserver\static\site.css" />
+    <Content Include="openrpaserver\templates\components\image-matching-capture-image-dialog-canvas.html" />
+    <Content Include="openrpaserver\templates\components\image-matching-capture-image-dialog.html" />
+    <Content Include="openrpaserver\templates\components\image-matching-node-property.html" />
+    <Content Include="openrpaserver\templates\components\node-class.html" />
+    <Content Include="openrpaserver\templates\components\node-instance.html" />
+    <Content Include="openrpaserver\templates\components\node-palette.html" />
+    <Content Include="openrpaserver\templates\components\node-property-panel.html" />
+    <Content Include="openrpaserver\templates\components\workflow-canvas.html" />
     <Content Include="openrpaserver\templates\edit.html" />
     <Content Include="requirements.txt" />
-    <Content Include="openrpaserver\templates\about.html" />
-    <Content Include="openrpaserver\templates\contact.html" />
     <Content Include="openrpaserver\templates\index.html" />
     <Content Include="openrpaserver\templates\layout.html" />
   </ItemGroup>

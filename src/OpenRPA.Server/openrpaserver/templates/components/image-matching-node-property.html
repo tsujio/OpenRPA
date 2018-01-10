@@ -1,0 +1,13 @@
+<script type="text/template" id="tmpl-image-matching-node-property">
+  <div class="image-matching-node-property">
+    <span class="node-type">{{ nodeInstance.type }}</span>
+
+    <mdc-fab icon="camera_alt" mini class="capture-button" @click="onCaptureButtonClick"></mdc-fab>
+
+    <img :src="captureImageSrc" class="capture-image" @click="onCaptureImageClick" />
+
+    <rpa-image-matching-capture-image-dialog
+        ref="captureImageDialog"
+        :node-instance="nodeInstance"></rpa-image-matching-capture-image-dialog>
+  </div>
+</script>

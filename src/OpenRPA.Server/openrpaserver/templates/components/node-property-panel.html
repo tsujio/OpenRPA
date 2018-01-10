@@ -1,0 +1,5 @@
+<script type="text/template" id="tmpl-node-property-panel">
+  <div class="node-property-panel" :class="{ hidden: !active}">
+    <rpa-image-matching-node-property v-if="nodeType === 'ImageMatching'" :node-instance="nodeInstance"></rpa-image-matching-node-property>
+  </div>
+</script>

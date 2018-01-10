@@ -1,30 +1,28 @@
-.sidebar {
+/*
+ * Node palette
+ */
+
+.node-palette {
     position: fixed;
-    top: 51px;
+    top: 64px;
     bottom: 0;
     left: 0;
     width: 200px;
     padding: 20px 10px;
+    box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
-    background: #f3f3f3;
-    border-right: 1px solid #eee;
+    background: #eee;
+    border-right: 1px solid #ccc;
 }
 
-h1 {
-    padding-bottom: 9px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
+/**
+ * Node class
+ * Node instance
+ */
 
-.canvas-panel {
-    margin-left: 200px;
-    margin-right: 300px;
-    padding: 0 20px;
-    overflow-x: scroll;
-}
-
-.node {
+.node-class,
+.node-instance {
     width: 150px;
     height: 60px;
     background: #eeeeef;
@@ -34,13 +32,43 @@ h1 {
     justify-content: center;
     cursor: pointer;
     border-radius: 0.8em;
-}
-
-.canvas .node {
     margin-top: 20px;
+    cursor: move;
 }
 
-.canvas {
+/*
+ * Workflow canvas
+ */
+
+.workflow-canvas {
+    margin-left: 200px;
+    margin-right: 300px;
+    padding: 0 20px;
+    overflow-x: scroll;
+    position: relative;
+}
+
+.workflow-canvas h1 {
+    padding-bottom: 9px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.workflow-canvas .execute-button {
+    position: absolute;
+    right: 0;
+    margin-top: 10px;
+    margin-right: calc(20px + 10px);
+}
+
+.workflow-canvas .canvas-panel {
+    margin-left: 200px;
+    margin-right: 300px;
+    padding: 0 20px;
+    overflow-x: scroll;
+}
+
+.workflow-canvas .canvas {
     margin-top: 20px;
     margin-bottom: 20px;
     background: #fafafa;
@@ -49,20 +77,45 @@ h1 {
     border: 1px solid lightgray;
 }
 
+/*
+ * Node property panel
+ */
+
 .node-property-panel {
     position: fixed;
-    top: 51px;
+    top: 64px;
     bottom: 0;
     right: 0;
     width: 300px;
     padding: 20px 10px;
-    background: #f3f3f3;
+    box-sizing: border-box;
+    background: #eee;
+    border-left: 1px solid #ccc;
 }
 
-.node-property-panel .capture-image {
+.node-property-panel.hidden {
+    display: none;
+}
+
+
+/*
+ * Image matching node property
+ */
+
+.image-matching-node-property .capture-button {
+    display: block;
+    margin: 2rem 10px;
+}
+
+.image-matching-node-property .capture-image {
     width: 100%;
 }
 
-.capture-image-modal .modal-body {
+/*
+ * Image matching capture image dialog canvas
+ */
+
+.image-matching-capture-image-dialog-canvas {
+    height: 400px; /* TODO: auto computing */
     overflow: scroll;
 }

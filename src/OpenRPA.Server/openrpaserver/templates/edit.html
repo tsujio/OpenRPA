@@ -1,90 +1,53 @@
-{% extends "layout.html" %}
+(% extends "layout.html" %)
 
-{% set no_container = True %}
-{% set hide_footer = True %}
+(% block stylesheets %)
 
-{% block stylesheets %}
+<link rel="stylesheet" href="(( url_for('static', filename='edit.css') ))">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='edit.css') }}">
+(% endblock %)
 
-{% endblock %}
+(% block content %)
 
-{% block content %}
+<!-- TODO: remove -->
+<div id="session-id" data-session-id="(( session['session_id']|e ))"></div>
 
-<div>
-  <div class="sidebar">
-    <div class="node-list">
-      <div class="node node-image-matching">
-        <span>Image Matching</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="canvas-panel">
-    <h1>Workflow Editor</h1>
-
-    <button class="btn btn-primary float-right" id="downloadButton">Download</button>
-
-    <div class="canvas">
-      <div class="flow">
-        <div class="node node-start">
-          <span>Start</span>
-        </div>
-
-        <div class="node node-end">
-          <span>End</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="node-property-panel">
-  </div>
+<div id="app">
+  <mdc-layout-app>
+    <mdc-toolbar slot="toolbar" fixed>
+      <mdc-toolbar-row>
+        <mdc-toolbar-section align-start>
+          <mdc-toolbar-menu-icon event="toggle-drawer"></mdc-toolbar-menu-icon>
+          <mdc-toolbar-title @click="onTitleClick">OpenRPA</mdc-toolbar-title>
+        </mdc-toolbar-section>
+      </mdc-toolbar-row>
+    </mdc-toolbar>
+    <mdc-drawer slot="drawer" temporary="true" toggle-on="toggle-drawer">
+      <mdc-drawer-list>
+        <mdc-drawer-item start-icon="inbox">Inbox</mdc-drawer-item>
+        <mdc-drawer-item start-icon="send">Sent Mail</mdc-drawer-item>
+        <mdc-drawer-item start-icon="drafts">Drafts</mdc-drawer-item>
+      </mdc-drawer-list>
+    </mdc-drawer>
+    <main class="content">
+      <rpa-node-palette></rpa-node-palette>
+      <rpa-workflow-canvas></rpa-workflow-canvas>
+      <rpa-node-property-panel ref="nodePropertyPanel" :active="isNodePropertyPanelActive"></rpa-node-property-panel>
+    </main>
+  </mdc-layout-app>
 </div>
 
-<script type="text/template" id="tmplImageMatchingNodeProperty">
-  <div class="image-matching-node-property">
-    <input type="text" class="name" placeholder="Node name" value="<%= name %>" />
+(% include 'components/node-palette.html' %)
+(% include 'components/workflow-canvas.html' %)
+(% include 'components/node-property-panel.html' %)
+(% include 'components/image-matching-node-property.html' %)
+(% include 'components/image-matching-capture-image-dialog.html' %)
+(% include 'components/image-matching-capture-image-dialog-canvas.html' %)
 
-    <button type="button" class="capture" data-token="{{ session['session_id'] }}">Capture</button>
+(% endblock %)
 
-    <select class="action">
-      <option value="lclick">Left Click</option>
-    </select>
+(% block scripts %)
 
-    <img class="capture-image" />
-  </div>
-</script>
-
-<div class="modal fade capture-image-modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Select image matching area</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <canvas class="capture-image-canvas" />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary save-button">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-
-<!-- Just for html template -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5sortable/0.6.3/html.sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js"></script>
-<script src="{{ url_for('static', filename='edit.js') }}"></script>
+<script src="(( url_for('static', filename='edit.js') ))"></script>
 
-{% endblock %}
+(% endblock %)

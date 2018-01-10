@@ -1,190 +1,331 @@
-// TODO: use MVC library
+window.onload = function() {
+  // Event bus object
+  var bus = new Vue();
 
-var capture, rect, title;
+  Vue.component('rpa-node-instance', {
+    template: '#tmpl-node-instance',
 
-$(() => {
-  var nodeListSortable = sortable('.sidebar .node-list', {
-    forcePlaceholderSize: true,
-    connectWith: 'flow',
+    props: ['type', 'name', 'prop'],
+
+    methods: {
+      onClick: function(e) {
+        // TODO: set json data instead of instance itself
+        bus.$emit('node-instance.click', this);
+      },
+    },
   });
 
-  var flowSortable = sortable('.canvas .flow', {
-    forcePlaceholderSize: true,
-    connectWith: 'flow',
+  Vue.component('rpa-node-class', {
+    template: '#tmpl-node-class',
+
+    props: ['type'],
+
+    methods: {
+      onDragStart: function(e) {
+        // Set dragged node class info
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          type: this.type
+        }));
+      },
+    },
   });
 
-  nodeListSortable[0].addEventListener('sortstart', (e) => {
-    if (e.detail.startparent === document.querySelector('.canvas .flow')) {
-      return;
-    }
+  Vue.component('rpa-node-palette', {
+    template: '#tmpl-node-palette',
 
-    var clone = e.detail.item.cloneNode(true);
-    e.detail.startparent.appendChild(clone);
-    sortable('.sidebar .node-list');
+    data: function() {
+      return {
+        // Node classes for making workflow
+        nodeClasses: [
+          {type: 'ImageMatching'},
+        ],
+      };
+    },
   });
 
-  $('.canvas').on('click', '.node', (e) => {
-    showNodePropertyPanel($(e.currentTarget));
+  Vue.component('rpa-workflow-canvas', {
+    template: '#tmpl-workflow-canvas',
+
+    data: function() {
+      return {
+        workflow: [
+          {type: 'Start', name: 'Start'},
+          {type: 'End', name: 'End'},
+        ],
+      };
+    },
+
+    methods: {
+      onDragOver: function(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        return false;
+      },
+
+      onDrop: function(e) {
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+
+        // Get dropped node class info
+        var nodeClass = JSON.parse(e.dataTransfer.getData('text/plain'));
+        var nodeInstance = {
+          type: nodeClass.type,
+          name: nodeClass.type,
+
+          // TODO
+          prop: {
+            image: null,
+            startPos: [0, 0],
+            endPos: [0, 0],
+          }
+        };
+
+        // Add to workflow
+        this.workflow.splice(this.workflow.length - 1, 0, nodeInstance);
+
+        return false;
+      },
+
+      onExecuteButtonClick: function() {
+        // TODO: serialize workflow and send
+        return;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (this.readyState === 4 && this.status === 200) {
+            var zip = new Blob([this.response], {type: 'application/zip'});
+
+            location.href = URL.createObjectURL(zip);
+          }
+        };
+        xhr.open('POST', '/download');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.responseType = 'blob';
+        xhr.send(JSON.stringify(workflow));
+      });
+      },
+    },
   });
 
-  function showNodePropertyPanel($node) {
-    $('.node-property-panel').html('');
+  Vue.component('rpa-node-property-panel', {
+    template: '#tmpl-node-property-panel',
 
-    var templateId;
-    if ($node.hasClass('node-image-matching')) {
-      templateId = '#tmplImageMatchingNodeProperty';
-    } else {
-      return;
-    }
+    props: ['active'],
 
-    var compiled = _.template($(templateId).html());
-    var html = compiled({
-      name: $node.text().trim(),
-    });
-    $('.node-property-panel').html(html);
-  }
+    data: function() {
+      return {
+        nodeInstance: null,
+      };
+    },
 
-  $('.node-property-panel').on('click', '.image-matching-node-property .capture', (e) => {
-    var socket = io.connect("http://localhost:5555/capture");
+    computed: {
+      nodeType: function() {
+        return (this.nodeInstance || {}).type;
+      },
+    },
 
-    socket.on('connect', function() {
-      console.log('connected.');
+    methods: {
+      activate: function(nodeInstance) {
+        this.nodeInstance = nodeInstance;
+      },
+    },
+  });
 
-      socket.emit('listen capture');
-    });
+  Vue.component('rpa-image-matching-node-property', {
+    template: '#tmpl-image-matching-node-property',
 
-    socket.on('receive capture', function(msg) {
-      var blob = new Blob([msg.capture], {type: 'image/png'});
+    props: ['nodeInstance'],
 
-      capture = blob;
-      title = msg.title;
-
-      var url = URL.createObjectURL(blob);
-
-      $('.capture-image').attr('src', url);
-
-      var canvas = document.querySelector('.capture-image-modal .capture-image-canvas');
-      var ctx = canvas.getContext('2d');
-      var img = new Image();
-      img.onload = function() {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-
-        $('.capture-image-modal').modal('show');
+    computed: {
+      captureImageSrc: function() {
+        if (!this.nodeInstance.prop.image) {
+          return "";
+        }
+        return URL.createObjectURL(this.nodeInstance.prop.image);
       }
-      img.src = url;
+    },
 
-      $('.capture-image').on('click', function(e) {
+    methods: {
+      onCaptureButtonClick: function() {
+        var self = this;
+        var socket = io.connect("http://localhost:5555/capture");
+
+        // TODO: socket error handling
+        socket.on('connect', function() {
+          console.log('connected.');
+
+          // Listen for sending screen capture
+          socket.emit('listen capture');
+        });
+
+        socket.on('ready receiving capture', function() {
+          // TODO: get from cookie
+          var sessionID = document.querySelector('#session-id').getAttribute('data-session-id');
+
+          // Launch local capture application
+          location.href = 'openrpa:capture/' + sessionID;
+        });
+
+        socket.on('receive capture', function(data) {
+          var blob = new Blob([data.capture], {type: 'image/png'});
+          self.nodeInstance.prop.image = blob;
+
+          socket.close();
+        });
+      },
+
+      onCaptureImageClick: function() {
+        this.$refs.captureImageDialog.show();
+      },
+    },
+  });
+
+  Vue.component('rpa-image-matching-capture-image-dialog', {
+    template: '#tmpl-image-matching-capture-image-dialog',
+
+    props: ['nodeInstance'],
+
+    methods: {
+      show: function() {
+        this.$refs.canvas.initialize();
+        this.$refs.dialog.show();
+      },
+
+      onSave: function() {
+        // TODO
+      },
+
+      onCancel: function() {
+        // TODO
+      },
+    },
+  });
+
+  Vue.component('rpa-image-matching-capture-image-dialog-canvas', {
+    template: '#tmpl-image-matching-capture-image-dialog-canvas',
+
+    props: ['nodeInstance'],
+
+    data: function() {
+      return {
+        isMouseDown: false,
+      };
+    },
+
+    methods: {
+      initialize: function() {
+        this.isMouseDown = false;
+        this.draw();
+      },
+
+      draw: function() {
+        var self = this;
+        var ctx = this.$refs.canvas.getContext('2d');
         var img = new Image();
+
         img.onload = function() {
-          canvas.width = img.width;
-          canvas.height = img.height;
+          self.$refs.canvas.width = img.width;
+          self.$refs.canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
 
-          if (startX !== undefined && startY !== undefined &&
-              endX !== undefined && endY !== undefined) {
-            ctx.strokeStyle = "#00ff00";
-            ctx.lineWidth = 5;
-            ctx.setLineDash([2, 3]);
-
-            ctx.beginPath();
-
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(endX, startY);
-
-            ctx.moveTo(startX,endY);
-            ctx.lineTo(endX,endY);
-
-            ctx.moveTo(endX,startY);
-            ctx.lineTo(endX,endY);
-
-            ctx.moveTo(startX,startY);
-            ctx.lineTo(startX,endY);
-
-            ctx.stroke();
-          }
-
-          $('.capture-image-modal').modal('show');
+          self.drawRect(ctx);
         }
-        img.src = url;
-      });
 
-      $('.capture-image-modal .modal-body').css('height', $(window).innerHeight() - 100);
+        // TODO: url cache
+        if (this.nodeInstance.prop.image) {
+          img.src = URL.createObjectURL(this.nodeInstance.prop.image);
+        }
+      },
 
-      var isMouseDown = false;
-      var startX, startY, endX, endY;
-      $(canvas).on('mousedown', function(e) {
-        isMouseDown = true;
+      drawRect: function(ctx) {
+        var startPos = this.nodeInstance.prop.startPos;
+        var endPos = this.nodeInstance.prop.endPos;
 
-        var rect = e.target.getBoundingClientRect();
-        startX = e.clientX - rect.left;
-        startY = e.clientY - rect.top;
+        if (startPos[0] === endPos[0] &&
+            startPos[1] === endPos[1]) {
+          return;
+        }
 
+        // Set line style
         ctx.strokeStyle = "#00ff00";
         ctx.lineWidth = 5;
         ctx.setLineDash([2, 3]);
-      }).on('mousemove', function(e) {
-        if (!isMouseDown) {
+
+        ctx.beginPath();
+
+        // Top
+        ctx.moveTo(startPos[0], startPos[1]);
+        ctx.lineTo(endPos[0], startPos[1]);
+
+        // Bottom
+        ctx.moveTo(startPos[0],endPos[1]);
+        ctx.lineTo(endPos[0],endPos[1]);
+
+        // Right
+        ctx.moveTo(endPos[0],startPos[1]);
+        ctx.lineTo(endPos[0],endPos[1]);
+
+        // Left
+        ctx.moveTo(startPos[0],startPos[1]);
+        ctx.lineTo(startPos[0],endPos[1]);
+
+        ctx.stroke();
+      },
+
+      onMouseDown: function(e) {
+        this.isMouseDown = true;
+
+        var rect = e.target.getBoundingClientRect();
+        this.nodeInstance.prop.startPos = [e.clientX - rect.left,
+                                           e.clientY - rect.top];
+      },
+
+      onMouseMove: function(e) {
+        if (!this.isMouseDown) {
           return;
         }
 
         var rect = e.target.getBoundingClientRect();
-        endX = e.clientX - rect.left;
-        endY = e.clientY - rect.top;
+        this.nodeInstance.prop.endPos = [e.clientX - rect.left,
+                                         e.clientY - rect.top];
 
-        ctx.drawImage(img, 0, 0);
+        this.draw();
+      },
 
-        ctx.beginPath();
-
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, startY);
-
-        ctx.moveTo(startX,endY);
-        ctx.lineTo(endX,endY);
-
-        ctx.moveTo(endX,startY);
-        ctx.lineTo(endX,endY);
-
-        ctx.moveTo(startX,startY);
-        ctx.lineTo(startX,endY);
-
-        ctx.stroke();
-      }).on('mouseup', function(e) {
-        isMouseDown = false;
-      });
-
-      $('.capture-image-modal .save-button').on('click', function() {
-        rect = {
-          "top": startY,
-          "left": startX,
-          "right": endX,
-          "bottom": endY,
-        };
-
-        $('.capture-image-modal').modal('hide');
-      });
-    });
-
-    location.href = 'openrpa:capture/' + $(e.currentTarget).attr('data-token');
+      onMouseUp: function() {
+        this.isMouseDown = false;
+      },
+    },
   });
 
-  $('#downloadButton').on('click', function() {
-    var fd = new FormData();
-    fd.append('capture', capture);
-    fd.append('rect', JSON.stringify(rect));
-    fd.append('title', title);
+  new Vue({
+    el: '#app',
 
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
-        var z = new Blob([this.response], {type: 'application/zip'});
+    created: function() {
+      var self = this;
+      bus.$on('node-instance.click', function(nodeInstance) {
+        self.activateNodePropertyPanel(nodeInstance);
+      });
+    },
 
-        location.href = URL.createObjectURL(z);
-      }
-    };
-    xhr.open('POST', '/download');
-    xhr.responseType = 'blob';
-    xhr.send(fd);
+    data: {
+      isNodePropertyPanelActive: false,
+    },
+
+    methods: {
+      activateNodePropertyPanel: function(nodeInstance) {
+        this.isNodePropertyPanelActive = true;
+        this.$refs.nodePropertyPanel.activate(nodeInstance);
+      },
+
+      onTitleClick: function() {
+        location.href = '/';
+      },
+    },
   });
-});
+};

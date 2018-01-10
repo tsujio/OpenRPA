@@ -1,0 +1,7 @@
+<script type="text/template" id="tmpl-node-palette">
+  <div class="node-palette">
+    <rpa-node-class v-for="nodeClass in nodeClasses" :type="nodeClass.type"></rpa-node-class>
+  </div>
+</script>
+
+(% include 'components/node-class.html' %)

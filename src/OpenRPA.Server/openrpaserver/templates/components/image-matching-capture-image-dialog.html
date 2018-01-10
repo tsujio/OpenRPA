@@ -1,0 +1,10 @@
+<script type="text/template" id="tmpl-image-matching-capture-image-dialog">
+  <div class="image-matching-capture-image-dialog">
+    <mdc-dialog ref="dialog" title="Select Matching Area" accept="Save" cancel="Cancel"
+                @accept="onSave" @cancel="onCancel">
+      <rpa-image-matching-capture-image-dialog-canvas
+          ref="canvas" class="image-dialog-canvas"
+          :node-instance="nodeInstance"></rpa-image-matching-capture-image-dialog-canvas>
+    </mdc-dialog>
+  </div>
+</script>

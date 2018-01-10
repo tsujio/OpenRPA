@@ -1,0 +1,16 @@
+<script type="text/template" id="tmpl-workflow-canvas">
+  <div class="workflow-canvas">
+    <h1>Workflow Name</h1>
+
+    <mdc-button raised class="execute-button" @click="onExecuteButtonClick">Execute</mdc-button>
+
+    <div class="canvas" @dragover="onDragOver" @drop="onDrop">
+      <div class="flow">
+        <rpa-node-instance v-for="node in workflow"
+                           :type="node.type" :name="node.name" :prop="node.prop"></rpa-node-instance>
+      </div>
+    </div>
+  </div>
+</script>
+
+(% include 'components/node-instance.html' %)
