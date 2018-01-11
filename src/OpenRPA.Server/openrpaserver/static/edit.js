@@ -93,9 +93,6 @@ window.onload = function() {
       },
 
       onExecuteButtonClick: function() {
-        // TODO: serialize workflow and send
-        return;
-
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
           if (this.readyState === 4 && this.status === 200) {
@@ -107,7 +104,7 @@ window.onload = function() {
         xhr.open('POST', '/download');
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.responseType = 'blob';
-        xhr.send(JSON.stringify(workflow));
+        xhr.send(JSON.stringify(this.workflow));
       },
     },
   });

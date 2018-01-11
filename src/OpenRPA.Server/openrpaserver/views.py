@@ -10,6 +10,7 @@ import json
 import os
 import re
 import sqlite3
+import uuid
 import zipfile
 from flask import request, render_template, session, send_file, url_for
 from flask_socketio import emit
@@ -124,27 +125,20 @@ def listen_capture():
 
 @app.route('/download', methods=['POST'])
 def download():
-    capture = request.files['capture']
-    rect = json.loads(request.form['rect'])
-    title = request.form['title']
+    workflow = request.get_json()
 
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
         z.writestr('Robotfile', json.dumps({
             "version": "0.0.1",
-            "id": "2ae54a21-9605-4fb4-a980-222b87578493",
+            "id": str(uuid.uuid4()),
             "name": "sample1",
             "program": "workflow.xml"
-        }).encode('utf-8'))
+        }, indent=4).encode('utf-8'))
 
-        z.writestr('workflow.xml', """
-        <?xml version="1.0" ?>
-        <Workflow>
-          <ImageMatch windowTitle="{title}" imagePath="{rect}" matchAction="LeftClick" />
-        </Workflow>
-        """.format(rect=rect, title=title).encode('utf-8'))
-
-        z.writestr('image.png', capture.read())
+        z.writestr('workflow.xml',
+                   json.dumps(workflow, indent=4).encode('utf-8'))
 
     buf.seek(0)
-    return send_file(buf, attachment_filename='robot.zip', mimetype='application/zip')
+    return send_file(buf, attachment_filename='robot.zip',
+                     mimetype='application/zip')
