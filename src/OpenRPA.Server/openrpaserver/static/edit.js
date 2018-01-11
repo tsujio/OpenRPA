@@ -23,7 +23,7 @@ window.onload = function() {
     methods: {
       onDragStart: function(e) {
         // Set dragged node class info
-        e.dataTransfer.setData('text/plain', JSON.stringify({
+        e.dataTransfer.setData('text', JSON.stringify({
           type: this.type
         }));
       },
@@ -72,7 +72,7 @@ window.onload = function() {
         }
 
         // Get dropped node class info
-        var nodeClass = JSON.parse(e.dataTransfer.getData('text/plain'));
+        var nodeClass = JSON.parse(e.dataTransfer.getData('text'));
         var nodeInstance = {
           type: nodeClass.type,
           name: nodeClass.type,
