@@ -107,7 +107,6 @@ window.onload = function() {
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.responseType = 'blob';
         xhr.send(JSON.stringify(workflow));
-      });
       },
     },
   });
