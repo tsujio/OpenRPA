@@ -79,7 +79,7 @@ window.onload = function() {
 
           // TODO
           prop: {
-            image: null,
+            imageURLPath: "",
             startPos: [0, 0],
             endPos: [0, 0],
           }
@@ -142,10 +142,7 @@ window.onload = function() {
 
     computed: {
       captureImageSrc: function() {
-        if (!this.nodeInstance.prop.image) {
-          return "";
-        }
-        return URL.createObjectURL(this.nodeInstance.prop.image);
+        return this.nodeInstance.prop.imageURLPath;
       }
     },
 
@@ -171,8 +168,8 @@ window.onload = function() {
         });
 
         socket.on('receive capture', function(data) {
-          var blob = new Blob([data.capture], {type: 'image/png'});
-          self.nodeInstance.prop.image = blob;
+          console.log(data);
+          self.nodeInstance.prop.imageURLPath = data.path;
 
           socket.close();
         });
@@ -235,10 +232,7 @@ window.onload = function() {
           self.drawRect(ctx);
         }
 
-        // TODO: url cache
-        if (this.nodeInstance.prop.image) {
-          img.src = URL.createObjectURL(this.nodeInstance.prop.image);
-        }
+        img.src = this.nodeInstance.prop.imageURLPath;
       },
 
       drawRect: function(ctx) {
