@@ -111,6 +111,10 @@
     width: 100%;
 }
 
+.image-matching-node-property .window-title.hidden {
+    display: none;
+}
+
 /*
  * Image matching capture image dialog canvas
  */

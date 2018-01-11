@@ -82,6 +82,7 @@ window.onload = function() {
             imageURLPath: "",
             startPos: [0, 0],
             endPos: [0, 0],
+            windowTitle: "",
           }
         };
 
@@ -141,9 +142,9 @@ window.onload = function() {
     props: ['nodeInstance'],
 
     computed: {
-      captureImageSrc: function() {
-        return this.nodeInstance.prop.imageURLPath;
-      }
+      hasImage: function() {
+        return this.nodeInstance.prop.imageURLPath !== "";
+      },
     },
 
     methods: {
@@ -170,6 +171,7 @@ window.onload = function() {
         socket.on('receive capture', function(data) {
           console.log(data);
           self.nodeInstance.prop.imageURLPath = data.path;
+          self.nodeInstance.prop.windowTitle = data.title;
 
           socket.close();
         });
