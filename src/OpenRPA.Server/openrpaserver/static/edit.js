@@ -92,19 +92,30 @@ window.onload = function() {
         return false;
       },
 
-      onExecuteButtonClick: function() {
+      saveWorkflow: function(callback) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
           if (this.readyState === 4 && this.status === 200) {
-            var zip = new Blob([this.response], {type: 'application/zip'});
-
-            location.href = URL.createObjectURL(zip);
+            // TODO: error handling
+            if (callback) {
+              callback(JSON.parse(this.response));
+            }
           }
         };
-        xhr.open('POST', '/download');
+        xhr.open('POST', '/workflow/save');
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.responseType = 'blob';
+        xhr.responseType = 'application/json';
         xhr.send(JSON.stringify(this.workflow));
+      },
+
+      onSaveButtonClick: function() {
+        this.saveWorkflow();
+      },
+
+      onExecuteButtonClick: function() {
+        this.saveWorkflow(function(resp) {
+          location.href = 'openrpa:execute/' + resp.id;
+        });
       },
     },
   });

@@ -12,7 +12,8 @@ import re
 import sqlite3
 import uuid
 import zipfile
-from flask import request, render_template, session, send_file, url_for
+from flask import (request, render_template, session, send_file, url_for,
+                   jsonify)
 from flask_socketio import emit
 from openrpaserver import app, socketio, redis
 
@@ -29,6 +30,13 @@ if not os.path.exists(SQLITE_FILE):
         CREATE TABLE captures (
             id CHAR(64),
             data BLOB
+        );
+        """)
+
+        c.execute("""
+        CREATE TABLE workflows (
+            id CHAR(64),
+            workflow TEXT
         );
         """)
 
@@ -121,6 +129,21 @@ def listen_capture():
             })
             pubsub.unsubscribe()
             break
+
+
+@app.route('/workflow/save', methods=['POST'])
+def save_workflow():
+    """Save workflow"""
+    workflow = request.get_json()
+
+    id = binascii.hexlify(os.urandom(SESSION_ID_LENGTH)).decode('utf-8')
+    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
+        c = conn.cursor()
+
+        c.execute("INSERT INTO workflows(id, workflow) VALUES (?, ?)",
+                  (id, json.dumps(workflow)))
+
+    return jsonify({'id': id})
 
 
 @app.route('/download', methods=['POST'])

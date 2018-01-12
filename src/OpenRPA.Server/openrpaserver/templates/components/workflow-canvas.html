@@ -2,7 +2,10 @@
   <div class="workflow-canvas">
     <h1>Workflow Name</h1>
 
-    <mdc-button raised class="execute-button" @click="onExecuteButtonClick">Execute</mdc-button>
+    <div class="canvas-controls">
+      <mdc-button raised @click="onSaveButtonClick">Save</mdc-button>
+      <mdc-button raised accent @click="onExecuteButtonClick">Execute</mdc-button>
+    </div>
 
     <div class="canvas" @dragover="onDragOver" @drop="onDrop">
       <div class="flow">
