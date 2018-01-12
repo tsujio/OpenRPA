@@ -9,12 +9,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenRPA.Capture;
+using OpenRPA.Interpreter;
 
 namespace OpenRPA.Client
 {
     public partial class ClientForm : Form
     {
         private bool hasBeenCommandExecuted = false;
+
+        private string serverUrl = ConfigurationManager.AppSettings["serverUrl"];
 
         public ClientForm()
         {
@@ -58,6 +61,10 @@ namespace OpenRPA.Client
         {
             switch (command)
             {
+                case "execute":
+                    DoExecuteCommand(schema, command, option);
+                    break;
+
                 case "capture":
                     DoCaptureCommand(schema, command, option);
                     break;
@@ -67,7 +74,23 @@ namespace OpenRPA.Client
             }
         }
 
+        // This is used for keeping command object in memory while executing command and
+        // not to be garbage collected by wrapping it.
         private Action commandAction;
+
+        private void DoExecuteCommand(string schema, string command, string option)
+        {
+            var interp = new RobotInterpreter(serverUrl, option);
+
+            commandAction = () =>
+            {
+                interp.Execute();
+
+                this.Close();
+            };
+
+            commandAction();
+        }
 
         private void DoCaptureCommand(string schema, string command, string option)
         {
@@ -75,7 +98,6 @@ namespace OpenRPA.Client
 
             var w = new WindowCapturer(captureImageUploadUrl, option);
 
-            // Wrap object by function not to garbage collected
             commandAction = () =>
             {
                 w.Finish += () =>

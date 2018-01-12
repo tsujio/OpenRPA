@@ -84,6 +84,10 @@
       <Project>{51D25789-7CEE-474D-96D2-48E1D0EB5D3C}</Project>
       <Name>OpenRPA.Capture</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenRPA.Interpreter\OpenRPA.Interpreter.csproj">
+      <Project>{9fa15a21-f175-4eb1-944c-4f730ad85ed0}</Project>
+      <Name>OpenRPA.Interpreter</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
