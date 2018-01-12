@@ -94,9 +94,7 @@ namespace OpenRPA.Client
 
         private void DoCaptureCommand(string schema, string command, string option)
         {
-            string captureImageUploadUrl = ConfigurationManager.AppSettings["captureImageUploadUrl"];
-
-            var w = new WindowCapturer(captureImageUploadUrl, option);
+            var w = new WindowCapturer(serverUrl, option);
 
             commandAction = () =>
             {

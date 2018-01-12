@@ -16,22 +16,30 @@ namespace OpenRPA.Capture
 
         private MouseHook mouseHook;
 
-        private string captureImageUploadUrl;
+        private string serverUrl;
 
         private string uploadToken;
 
-        public WindowCapturer(string captureImageUploadUrl, string uploadToken)
+        private string CaptureUploadUrl
         {
-            if (String.IsNullOrWhiteSpace(captureImageUploadUrl))
+            get
             {
-                throw new ArgumentException("captureImageUploadUrl not specified");
+                return this.serverUrl + "/capture?token=" + this.uploadToken;
+            }
+        }
+
+        public WindowCapturer(string serverUrl, string uploadToken)
+        {
+            if (String.IsNullOrWhiteSpace(serverUrl))
+            {
+                throw new ArgumentException("serverUrl not specified");
             }
             if (!IsValidUploadToken(uploadToken))
             {
                 throw new ArgumentException("Invalid uploadToken");
             }
 
-            this.captureImageUploadUrl = captureImageUploadUrl;
+            this.serverUrl = serverUrl;
             this.uploadToken = uploadToken;
         }
 
@@ -81,9 +89,7 @@ namespace OpenRPA.Capture
                     formData.Add(content, "capture", "capture.png");
                     formData.Add(new StringContent(w.WindowTitle), "title");
 
-                    var url = this.captureImageUploadUrl + "?token=" + this.uploadToken;
-
-                    var response = client.PostAsync(url, formData).Result;
+                    var response = client.PostAsync(this.CaptureUploadUrl, formData).Result;
                     if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception("Sending captured image failed");
