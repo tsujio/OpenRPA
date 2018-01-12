@@ -143,12 +143,20 @@ def save_workflow():
         c.execute("INSERT INTO workflows(id, workflow) VALUES (?, ?)",
                   (id, json.dumps(workflow)))
 
+        conn.commit()
+
     return jsonify({'id': id})
 
 
-@app.route('/download', methods=['POST'])
-def download():
-    workflow = request.get_json()
+@app.route('/workflow/<id>', methods=['GET'])
+def get_workflow(id):
+    """Get workflow"""
+    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
+        c = conn.cursor()
+
+        c.execute("SELECT id, workflow FROM workflows WHERE id = ?", (id,))
+
+        row = c.fetchone()
 
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
@@ -159,8 +167,7 @@ def download():
             "program": "workflow.xml"
         }, indent=4).encode('utf-8'))
 
-        z.writestr('workflow.xml',
-                   json.dumps(workflow, indent=4).encode('utf-8'))
+        z.writestr('workflow.xml', row[1].encode('utf-8'))
 
     buf.seek(0)
     return send_file(buf, attachment_filename='robot.zip',
