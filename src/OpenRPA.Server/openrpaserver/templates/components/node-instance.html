@@ -1,6 +1,7 @@
 <script type="text/template" id="tmpl-node-instance">
-  <div class="node-instance">
-    <div class="instance-area" @click="onClick">
+  <div class="node-instance" :class="{hidden: isDragged}">
+    <div class="instance-area" :draggable="draggable"
+         @dragstart="onDragStart" @dragend="onDragEnd" @click="onClick">
       <span>{{ name }}</span>
     </div>
     <div class="successor-drop-area" :class="{emphasized: isSuccessorOn}"

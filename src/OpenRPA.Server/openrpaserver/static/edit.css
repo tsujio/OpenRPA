@@ -38,6 +38,10 @@
  * Node instance
  */
 
+.node-instance.hidden {
+    display: none;
+}
+
 .node-instance .successor-drop-area {
     width: 200px;
     height: 20px;

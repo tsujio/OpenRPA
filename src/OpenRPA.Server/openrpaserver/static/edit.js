@@ -9,6 +9,7 @@ window.onload = function() {
 
     data: function() {
       return {
+        isDragged: false,
         isSuccessorOn: false,
       };
     },
@@ -16,6 +17,14 @@ window.onload = function() {
     computed: {
       canHaveSuccessor: function() {
         return this.type !== 'End';
+      },
+
+      draggable: function() {
+        if (this.type === 'Start' || this.type === 'End') {
+          return 'false';
+        } else {
+          return 'true';
+        }
       },
     },
 
@@ -30,6 +39,23 @@ window.onload = function() {
     methods: {
       onClick: function(e) {
         bus.$emit('node-instance.click', this);
+      },
+
+      onDragStart: function(e) {
+        this.isDragged = true;
+
+        // Set dragged node class info
+        e.dataTransfer.setData('text', JSON.stringify({
+          id: this.id,
+          type: this.type,
+          displayType: this.displayType,
+          name: this.name,
+          prop: this.prop,
+        }));
+      },
+
+      onDragEnd: function() {
+        this.isDragged = false;
       },
 
       onSuccessorDragEnter: function() {
@@ -57,11 +83,12 @@ window.onload = function() {
 
         this.isSuccessorOn = false;
 
-        // Get dropped node class info
-        var nodeClass = JSON.parse(e.dataTransfer.getData('text'));
+        // Get dropped node info
+        var nodeInfo = JSON.parse(e.dataTransfer.getData('text'));
 
         // Notify to parent
-        this.$emit('successordrop', this.id, nodeClass);
+        var action = nodeInfo.id ? 'move' : 'create';
+        this.$emit('successordrop', this.id, action, nodeInfo);
 
         return false;
       },
@@ -119,21 +146,33 @@ window.onload = function() {
         return -1;
       },
 
-      onSuccessorDrop: function(predecessorId, nodeClass) {
-        var nodeInstance = {
-          id: uuid(),
-          type: nodeClass.type,
-          displayType: nodeClass.displayType,
-          name: nodeClass.displayType,
+      onSuccessorDrop: function(predecessorId, action, nodeInfo) {
+        var nodeInstance;
+        if (action === 'move') {
+          nodeInstance = nodeInfo;
+        } else {
+          // Create node instance
+          nodeInstance = {
+            id: uuid(),
+            type: nodeInfo.type,
+            displayType: nodeInfo.displayType,
+            name: nodeInfo.displayType,
 
-          // TODO
-          prop: {
-            imageUrlPath: "",
-            startPos: [0, 0],
-            endPos: [0, 0],
-            windowTitle: "",
-          }
-        };
+            // TODO
+            prop: {
+              imageUrlPath: "",
+              startPos: [0, 0],
+              endPos: [0, 0],
+              windowTitle: "",
+            }
+          };
+        }
+
+        if (action === 'move') {
+          // Remove node at previous position
+          var idx = this.findPositionById(nodeInstance.id);
+          this.workflow.splice(idx, 1);
+        }
 
         // Add to workflow
         var i = this.findPositionById(predecessorId);
