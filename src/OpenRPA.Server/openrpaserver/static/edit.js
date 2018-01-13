@@ -78,7 +78,7 @@ window.onload = function() {
 
           // TODO
           prop: {
-            imageURLPath: "",
+            imageUrlPath: "",
             startPos: [0, 0],
             endPos: [0, 0],
             windowTitle: "",
@@ -163,7 +163,7 @@ window.onload = function() {
 
     computed: {
       hasImage: function() {
-        return this.nodeInstance.prop.imageURLPath !== "";
+        return this.nodeInstance.prop.imageUrlPath !== "";
       },
     },
 
@@ -201,7 +201,7 @@ window.onload = function() {
           capturing = false;
 
           console.log(data);
-          self.nodeInstance.prop.imageURLPath = data.path;
+          self.nodeInstance.prop.imageUrlPath = data.path;
           self.nodeInstance.prop.windowTitle = data.title;
 
           socket.close();
@@ -219,18 +219,35 @@ window.onload = function() {
 
     props: ['nodeInstance'],
 
+    data: function() {
+      return {
+        imageUrlPath: "",
+        startPos: null,
+        endPos: null,
+      };
+    },
+
     methods: {
       show: function() {
-        this.$refs.canvas.initialize();
-        this.$refs.dialog.show();
+        var prop = JSON.parse(JSON.stringify(this.nodeInstance.prop));
+        this.imageUrlPath = prop.imageUrlPath;
+        this.startPos = prop.startPos;
+        this.endPos = prop.endPos;
+
+        // Use setTimeout for propagating data change
+        var self = this;
+        setTimeout(function() {
+          self.$refs.canvas.initialize();
+          self.$refs.dialog.show();
+        });
       },
 
       onSave: function() {
-        // TODO
+        this.nodeInstance.prop.startPos = this.startPos;
+        this.nodeInstance.prop.endPos = this.endPos;
       },
 
       onCancel: function() {
-        // TODO
       },
     },
   });
@@ -238,7 +255,7 @@ window.onload = function() {
   Vue.component('rpa-image-matching-capture-image-dialog-canvas', {
     template: '#tmpl-image-matching-capture-image-dialog-canvas',
 
-    props: ['nodeInstance'],
+    props: ['imageUrlPath', 'startPos', 'endPos'],
 
     data: function() {
       return {
@@ -264,13 +281,12 @@ window.onload = function() {
 
           self.drawRect(ctx);
         }
-
-        img.src = this.nodeInstance.prop.imageURLPath;
+        img.src = this.imageUrlPath;
       },
 
       drawRect: function(ctx) {
-        var startPos = this.nodeInstance.prop.startPos;
-        var endPos = this.nodeInstance.prop.endPos;
+        var startPos = this.startPos;
+        var endPos = this.endPos;
 
         if (startPos[0] === endPos[0] &&
             startPos[1] === endPos[1]) {
@@ -307,8 +323,8 @@ window.onload = function() {
         this.isMouseDown = true;
 
         var rect = e.target.getBoundingClientRect();
-        this.nodeInstance.prop.startPos = [e.clientX - rect.left,
-                                           e.clientY - rect.top];
+        this.startPos[0] = e.clientX - rect.left;
+        this.startPos[1] = e.clientY - rect.top;
       },
 
       onMouseMove: function(e) {
@@ -317,8 +333,8 @@ window.onload = function() {
         }
 
         var rect = e.target.getBoundingClientRect();
-        this.nodeInstance.prop.endPos = [e.clientX - rect.left,
-                                         e.clientY - rect.top];
+        this.endPos[0] = e.clientX - rect.left;
+        this.endPos[1] = e.clientY - rect.top;
 
         this.draw();
       },

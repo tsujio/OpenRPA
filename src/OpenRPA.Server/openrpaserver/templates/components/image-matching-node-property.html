@@ -4,7 +4,7 @@
 
     <mdc-fab icon="camera_alt" mini class="capture-button" @click="onCaptureButtonClick"></mdc-fab>
 
-    <img :src="nodeInstance.prop.imageURLPath" class="capture-image" @click="onCaptureImageClick" />
+    <img :src="nodeInstance.prop.imageUrlPath" class="capture-image" @click="onCaptureImageClick" />
 
     <mdc-textfield v-model="nodeInstance.prop.windowTitle"
                    class="window-title" :class="{hidden: !hasImage}" label="Window title" />
