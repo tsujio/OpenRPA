@@ -120,6 +120,6 @@
  */
 
 .image-matching-capture-image-dialog-canvas {
-    height: 400px; /* TODO: auto computing */
+    height: 50vh;
     overflow: scroll;
 }
