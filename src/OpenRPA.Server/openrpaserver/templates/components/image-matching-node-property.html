@@ -7,7 +7,10 @@
 
     <mdc-fab icon="camera_alt" mini class="capture-button" @click="onCaptureButtonClick"></mdc-fab>
 
-    <img :src="nodeInstance.prop.imageUrlPath" class="capture-image" @click="onCaptureImageClick" />
+    <div class="capture-image-container" :class="{hidden: !hasImage}" @click="onCaptureImageClick">
+      <span class="select-area-notice" :class="{hidden: hasRect}">Click here and select matching area.</span>
+      <img :src="nodeInstance.prop.imageUrlPath" class="capture-image" />
+    </div>
 
     <mdc-textfield v-model="nodeInstance.prop.windowTitle"
                    class="window-title" :class="{hidden: !hasImage}" label="Window title" />

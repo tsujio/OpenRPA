@@ -186,6 +186,13 @@ window.onload = function() {
       hasImage: function() {
         return this.nodeInstance.prop.imageUrlPath !== "";
       },
+
+      hasRect: function() {
+        return this.nodeInstance.prop.startPos[0] !== 0 &&
+          this.nodeInstance.prop.startPos[1] !== 0 &&
+          this.nodeInstance.prop.endPos[0] !== 0 &&
+          this.nodeInstance.prop.endPos[1] !== 0;
+      },
     },
 
     methods: {
@@ -226,6 +233,8 @@ window.onload = function() {
           self.nodeInstance.prop.windowTitle = data.title;
 
           socket.close();
+
+          self.$refs.captureImageDialog.show();
         });
       },
 
