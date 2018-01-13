@@ -5,7 +5,15 @@ window.onload = function() {
   Vue.component('rpa-node-instance', {
     template: '#tmpl-node-instance',
 
-    props: ['type', 'name', 'prop'],
+    props: ['id', 'type', 'displayType', 'name', 'prop'],
+
+    updated: function() {
+      this.$emit('nodepropertychange', {
+        id: this.id,
+        name: this.name,
+        prop: this.prop,
+      });
+    },
 
     methods: {
       onClick: function(e) {
@@ -17,13 +25,14 @@ window.onload = function() {
   Vue.component('rpa-node-class', {
     template: '#tmpl-node-class',
 
-    props: ['type'],
+    props: ['type', 'displayType'],
 
     methods: {
       onDragStart: function(e) {
         // Set dragged node class info
         e.dataTransfer.setData('text', JSON.stringify({
-          type: this.type
+          type: this.type,
+          displayType: this.displayType,
         }));
       },
     },
@@ -36,7 +45,7 @@ window.onload = function() {
       return {
         // Node classes for making workflow
         nodeClasses: [
-          {type: 'ImageMatching'},
+          {type: 'ImageMatching', displayType: 'Image Matching'},
         ],
       };
     },
@@ -48,8 +57,8 @@ window.onload = function() {
     data: function() {
       return {
         workflow: [
-          {type: 'Start', name: 'Start'},
-          {type: 'End', name: 'End'},
+          {type: 'Start', displayType: 'Start', name: 'Start'},
+          {type: 'End', displayType: 'End', name: 'End'},
         ],
       };
     },
@@ -73,8 +82,10 @@ window.onload = function() {
         // Get dropped node class info
         var nodeClass = JSON.parse(e.dataTransfer.getData('text'));
         var nodeInstance = {
+          id: uuid(),
           type: nodeClass.type,
-          name: nodeClass.type,
+          displayType: nodeClass.displayType,
+          name: nodeClass.displayType,
 
           // TODO
           prop: {
@@ -89,6 +100,16 @@ window.onload = function() {
         this.workflow.splice(this.workflow.length - 1, 0, nodeInstance);
 
         return false;
+      },
+
+      onNodePropertyChange: function(e) {
+        for (var node of this.workflow) {
+          if (node.id === e.id) {
+            node.name = e.name;
+            node.prop = e.prop;
+            break;
+          }
+        }
       },
 
       saveWorkflow: function(callback) {

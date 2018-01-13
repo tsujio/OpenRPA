@@ -10,7 +10,10 @@
     <div class="canvas" @dragover="onDragOver" @drop="onDrop">
       <div class="flow">
         <rpa-node-instance v-for="node in workflow"
-                           :type="node.type" :name="node.name" :prop="node.prop"></rpa-node-instance>
+                           :id="node.id" :type="node.type"
+                           :display-type="node.displayType" :name="node.name"
+                           :prop="node.prop"
+                           @nodepropertychange="onNodePropertyChange"></rpa-node-instance>
       </div>
     </div>
   </div>
