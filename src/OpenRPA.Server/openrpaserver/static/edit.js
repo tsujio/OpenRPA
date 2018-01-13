@@ -92,15 +92,23 @@ window.onload = function() {
       },
 
       saveWorkflow: function(callback) {
+        callback = callback || function() {};
+
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-          if (this.readyState === 4 && this.status === 200) {
-            // TODO: error handling
-            if (callback) {
+          if (this.readyState === 4) {
+            if (this.status === 200) {
               callback(JSON.parse(this.response));
+            } else {
+              callback(null, new Error("Server returned status " + this.status));
             }
           }
         };
+
+        xhr.onerror = function(err) {
+          callback(null, err);
+        };
+
         xhr.open('POST', '/workflow/save');
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.responseType = 'application/json';
@@ -112,7 +120,12 @@ window.onload = function() {
       },
 
       onExecuteButtonClick: function() {
-        this.saveWorkflow(function(resp) {
+        this.saveWorkflow(function(resp, err) {
+          if (err) {
+            alert(err);
+            return;
+          }
+
           location.href = 'openrpa:execute/' + resp.id;
         });
       },
