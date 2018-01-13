@@ -163,17 +163,18 @@ window.onload = function() {
         // TODO: socket error handling
         socket.on('connect', function() {
           console.log('connected.');
-
-          // Listen for sending screen capture
-          socket.emit('listen capture');
         });
 
-        socket.on('ready receiving capture', function() {
+        socket.on('receiving capture ready', function() {
           // TODO: get from cookie
           var sessionID = document.querySelector('#session-id').getAttribute('data-session-id');
 
           // Launch local capture application
-          location.href = 'openrpa:capture/' + sessionID;
+          // (Not use location.href for Chrome/IE support)
+          var iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = 'openrpa:capture/' + sessionID;
+          document.body.appendChild(iframe);
         });
 
         socket.on('receive capture', function(data) {

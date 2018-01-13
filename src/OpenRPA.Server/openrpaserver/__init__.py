@@ -4,7 +4,6 @@ The flask application package.
 
 from flask import Flask
 from flask_socketio import SocketIO
-from flask_redis import FlaskRedis
 from . import config
 
 
@@ -25,7 +24,6 @@ app = CustomFlask(__name__)
 
 app.config.from_object(config.DevelopmentConfig)
 
-socketio = SocketIO(app)
-redis = FlaskRedis(app)
+socketio = SocketIO(app, message_queue=app.config['REDIS_URL'])
 
 import openrpaserver.views

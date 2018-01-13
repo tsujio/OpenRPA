@@ -14,8 +14,8 @@ import uuid
 import zipfile
 from flask import (request, render_template, session, send_file, url_for,
                    jsonify)
-from flask_socketio import emit
-from openrpaserver import app, socketio, redis
+from flask_socketio import SocketIO, emit, join_room, leave_room
+from openrpaserver import app, socketio
 
 SESSION_ID_LENGTH = 32
 
@@ -66,6 +66,19 @@ def edit():
     )
 
 
+@app.route('/capture/<id>', methods=['GET'])
+def get_capture(id):
+    """Get uploaded window capture"""
+    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
+        c = conn.cursor()
+
+        c.execute("SELECT id, data FROM captures WHERE id = ?", (id,))
+
+        row = c.fetchone()
+
+    return send_file(io.BytesIO(row[1]), mimetype='image/png')
+
+
 @app.route('/capture', methods=['POST'])
 def upload_capture():
     """Window capture upload handler."""
@@ -87,48 +100,23 @@ def upload_capture():
 
         conn.commit()
 
-    channel = 'capture-' + token
-    print('publish: ' + channel)
-    redis.publish(channel, json.dumps({
-        'capture_id': capture_id,
+    print(app.config['REDIS_URL'])
+    socket = SocketIO(message_queue=app.config['REDIS_URL'])
+    socket.emit('receive capture', {
+        'path': url_for('get_capture', id=capture_id),
         'title': title,
-    }))
+    }, room=token, namespace='/capture')
 
     return 'OK', 200
 
 
-@app.route('/capture/<id>', methods=['GET'])
-def get_capture(id):
-    """Get uploaded window capture"""
-    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
-        c = conn.cursor()
-
-        c.execute("SELECT id, data FROM captures WHERE id = ?", (id,))
-
-        row = c.fetchone()
-
-    return send_file(io.BytesIO(row[1]), mimetype='image/png')
-
-
-@socketio.on('listen capture', namespace='/capture')
+@socketio.on('connect', namespace='/capture')
 def listen_capture():
     """Handle request for sending uploaded capture image"""
-    pubsub = redis.pubsub()
-    print('subscribe: ' + 'capture-' + session['session_id'])
-    pubsub.subscribe(['capture-' + session['session_id']])
+    join_room(session['session_id'])
+    emit('receiving capture ready')
 
-    emit('ready receiving capture')
-
-    for item in pubsub.listen():
-        print(item)
-        if item['type'] == 'message':
-            data = json.loads(item['data'])
-            emit('receive capture', {
-                'title': data['title'],
-                'path': url_for('get_capture', id=data['capture_id']),
-            })
-            pubsub.unsubscribe()
-            break
+    # TODO: leave_room at appropriate point
 
 
 @app.route('/workflow/save', methods=['POST'])
