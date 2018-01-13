@@ -42,6 +42,10 @@
     display: none;
 }
 
+.node-instance .instance-area.selected {
+    border: 2px solid blue;
+}
+
 .node-instance .successor-drop-area {
     width: 200px;
     height: 20px;

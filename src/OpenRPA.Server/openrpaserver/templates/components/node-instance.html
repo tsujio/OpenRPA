@@ -1,6 +1,7 @@
 <script type="text/template" id="tmpl-node-instance">
   <div class="node-instance" :class="{hidden: isDragged}">
-    <div class="instance-area" :draggable="draggable"
+    <div class="instance-area" :class="{selected: isSelected}"
+         :draggable="draggable"
          @dragstart="onDragStart" @dragend="onDragEnd" @click="onClick">
       <span>{{ name }}</span>
     </div>

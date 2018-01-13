@@ -9,6 +9,7 @@ window.onload = function() {
 
     data: function() {
       return {
+        isSelected: false,
         isDragged: false,
         isSuccessorOn: false,
       };
@@ -26,6 +27,18 @@ window.onload = function() {
           return 'true';
         }
       },
+    },
+
+    created: function() {
+      var self = this;
+      bus.$on('workflow-canvas.selectnode', function(id) {
+        if (self.id === id) {
+          self.isSelected = true;
+          bus.$emit('node-instance.select', self);
+        } else {
+          self.isSelected = false;
+        }
+      });
     },
 
     updated: function() {
@@ -136,6 +149,12 @@ window.onload = function() {
       };
     },
 
+    created: function() {
+      bus.$on('node-instance.click', function(nodeInstance) {
+        bus.$emit('workflow-canvas.selectnode', nodeInstance.id);
+      });
+    },
+
     methods: {
       findPositionById: function(id) {
         for (var i = 0; i < this.workflow.length; i++) {
@@ -177,6 +196,11 @@ window.onload = function() {
         // Add to workflow
         var i = this.findPositionById(predecessorId);
         this.workflow.splice(i + 1, 0, nodeInstance);
+
+        setTimeout(function() {
+          // Emit after new node created
+          bus.$emit('workflow-canvas.selectnode', nodeInstance.id);
+        });
 
         return false;
       },
@@ -459,7 +483,7 @@ window.onload = function() {
 
     created: function() {
       var self = this;
-      bus.$on('node-instance.click', function(nodeInstance) {
+      bus.$on('node-instance.select', function(nodeInstance) {
         self.activateNodePropertyPanel(nodeInstance);
       });
     },
