@@ -22,7 +22,7 @@
  */
 
 .node-class,
-.node-instance {
+.node-instance .instance-area {
     width: 150px;
     height: 60px;
     background: #eeeeef;
@@ -30,10 +30,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     border-radius: 0.8em;
-    margin-top: 20px;
     cursor: move;
+}
+
+/*
+ * Node instance
+ */
+
+.node-instance .successor-drop-area {
+    width: 200px;
+    height: 20px;
+    margin-left: calc((150px - 200px) / 2);
+}
+
+.node-instance .successor-drop-area.emphasized {
+    height: 80px;
 }
 
 /*

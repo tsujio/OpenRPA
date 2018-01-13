@@ -1,5 +1,13 @@
 <script type="text/template" id="tmpl-node-instance">
-  <div class="node-instance" @click="onClick">
-    <span>{{ name }}</span>
+  <div class="node-instance">
+    <div class="instance-area" @click="onClick">
+      <span>{{ name }}</span>
+    </div>
+    <div class="successor-drop-area" :class="{emphasized: isSuccessorOn}"
+         v-if="canHaveSuccessor"
+         @dragenter="onSuccessorDragEnter"
+         @dragover="onSuccessorDragOver"
+         @dragleave="onSuccessorDragLeave"
+         @drop="onSuccessorDrop"></div>
   </div>
 </script>

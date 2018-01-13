@@ -7,6 +7,18 @@ window.onload = function() {
 
     props: ['id', 'type', 'displayType', 'name', 'prop'],
 
+    data: function() {
+      return {
+        isSuccessorOn: false,
+      };
+    },
+
+    computed: {
+      canHaveSuccessor: function() {
+        return this.type !== 'End';
+      },
+    },
+
     updated: function() {
       this.$emit('nodepropertychange', {
         id: this.id,
@@ -18,6 +30,40 @@ window.onload = function() {
     methods: {
       onClick: function(e) {
         bus.$emit('node-instance.click', this);
+      },
+
+      onSuccessorDragEnter: function() {
+        this.isSuccessorOn = true;
+      },
+
+      onSuccessorDragOver: function(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        return false;
+      },
+
+      onSuccessorDragLeave: function() {
+        this.isSuccessorOn = false;
+      },
+
+      onSuccessorDrop: function(e) {
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+
+        this.isSuccessorOn = false;
+
+        // Get dropped node class info
+        var nodeClass = JSON.parse(e.dataTransfer.getData('text'));
+
+        // Notify to parent
+        this.$emit('successordrop', this.id, nodeClass);
+
+        return false;
       },
     },
   });
@@ -57,30 +103,23 @@ window.onload = function() {
     data: function() {
       return {
         workflow: [
-          {type: 'Start', displayType: 'Start', name: 'Start'},
-          {type: 'End', displayType: 'End', name: 'End'},
+          {id: uuid(), type: 'Start', displayType: 'Start', name: 'Start'},
+          {id: uuid(), type: 'End', displayType: 'End', name: 'End'},
         ],
       };
     },
 
     methods: {
-      onDragOver: function(e) {
-        if (e.preventDefault) {
-          e.preventDefault();
+      findPositionById: function(id) {
+        for (var i = 0; i < this.workflow.length; i++) {
+          if (this.workflow[i].id === id) {
+            return i;
+          }
         }
-        return false;
+        return -1;
       },
 
-      onDrop: function(e) {
-        if (e.stopPropagation) {
-          e.stopPropagation();
-        }
-        if (e.preventDefault) {
-          e.preventDefault();
-        }
-
-        // Get dropped node class info
-        var nodeClass = JSON.parse(e.dataTransfer.getData('text'));
+      onSuccessorDrop: function(predecessorId, nodeClass) {
         var nodeInstance = {
           id: uuid(),
           type: nodeClass.type,
@@ -97,7 +136,8 @@ window.onload = function() {
         };
 
         // Add to workflow
-        this.workflow.splice(this.workflow.length - 1, 0, nodeInstance);
+        var i = this.findPositionById(predecessorId);
+        this.workflow.splice(i + 1, 0, nodeInstance);
 
         return false;
       },

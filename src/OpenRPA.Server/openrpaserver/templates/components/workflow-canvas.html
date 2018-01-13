@@ -7,12 +7,13 @@
       <mdc-button raised accent @click="onExecuteButtonClick">Execute</mdc-button>
     </div>
 
-    <div class="canvas" @dragover="onDragOver" @drop="onDrop">
+    <div class="canvas">
       <div class="flow">
         <rpa-node-instance v-for="node in workflow"
                            :id="node.id" :type="node.type"
                            :display-type="node.displayType" :name="node.name"
                            :prop="node.prop"
+                           @successordrop="onSuccessorDrop"
                            @nodepropertychange="onNodePropertyChange"></rpa-node-instance>
       </div>
     </div>
