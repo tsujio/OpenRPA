@@ -9,7 +9,6 @@ window.onload = function() {
 
     methods: {
       onClick: function(e) {
-        // TODO: set json data instead of instance itself
         bus.$emit('node-instance.click', this);
       },
     },
