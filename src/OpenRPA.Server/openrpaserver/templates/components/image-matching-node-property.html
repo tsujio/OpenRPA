@@ -2,6 +2,9 @@
   <div class="image-matching-node-property">
     <span class="node-type">{{ nodeInstance.type }}</span>
 
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
     <mdc-fab icon="camera_alt" mini class="capture-button" @click="onCaptureButtonClick"></mdc-fab>
 
     <img :src="nodeInstance.prop.imageUrlPath" class="capture-image" @click="onCaptureImageClick" />
