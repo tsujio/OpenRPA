@@ -165,7 +165,13 @@ window.onload = function() {
           console.log('connected.');
         });
 
+        var capturing = false;
+
         socket.on('receiving capture ready', function() {
+          if (capturing) {
+            return;
+          }
+
           // TODO: get from cookie
           var sessionID = document.querySelector('#session-id').getAttribute('data-session-id');
 
@@ -175,9 +181,13 @@ window.onload = function() {
           iframe.style.display = 'none';
           iframe.src = 'openrpa:capture/' + sessionID;
           document.body.appendChild(iframe);
+
+          capturing = true;
         });
 
         socket.on('receive capture', function(data) {
+          capturing = false;
+
           console.log(data);
           self.nodeInstance.prop.imageURLPath = data.path;
           self.nodeInstance.prop.windowTitle = data.title;
