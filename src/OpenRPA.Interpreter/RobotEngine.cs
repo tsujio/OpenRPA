@@ -67,7 +67,9 @@ namespace OpenRPA.Interpreter
             string path = DownloadRobot();
 
             var robotFile = RobotFile.Load(path);
-            string programPath = robotFile.GetAbsolutePath(robotFile.Meta.Program);
+
+            var interp = new WorkflowInterpreter(robotFile);
+            interp.Start();
         }
 
         private string DownloadRobot()

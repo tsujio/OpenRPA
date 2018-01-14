@@ -47,6 +47,11 @@
     <Compile Include="RobotEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotFile.cs" />
+    <Compile Include="Wml\EndNode.cs" />
+    <Compile Include="Wml\ImageMatchingNode.cs" />
+    <Compile Include="Wml\StartNode.cs" />
+    <Compile Include="Wml\WmlNode.cs" />
+    <Compile Include="WorkflowInterpreter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

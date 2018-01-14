@@ -43,6 +43,19 @@ namespace OpenRPA.Windows
             return new WindowModel(proc);
         }
 
+        public static WindowModel FindByTitle(string title)
+        {
+            foreach (var p in Process.GetProcesses())
+            {
+                if (p.MainWindowTitle.Contains(title))
+                {
+                    return new WindowModel(p);
+                }
+            }
+
+            throw new Exception($"Window '{title}' not found");
+        }
+
         private WindowModel(Process process)
         {
             this.process = process;

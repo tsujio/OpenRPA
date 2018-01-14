@@ -75,7 +75,7 @@ namespace OpenRPA.Interpreter
 
         internal string GetAbsolutePath(string relativePath)
         {
-            return Path.Combine(this.path, relativePath);
+            return Path.Combine(this.dest, relativePath);
         }
     }
 }
