@@ -13,6 +13,7 @@
                            :id="node.id" :type="node.type"
                            :display-type="node.displayType" :name="node.name"
                            :prop="node.prop"
+                           :key="node.id"
                            @successordrop="onSuccessorDrop"
                            @nodepropertychange="onNodePropertyChange"></rpa-node-instance>
       </div>
