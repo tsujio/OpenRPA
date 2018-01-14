@@ -48,6 +48,6 @@ namespace OpenRPA.Interpreter.Wml
             Name = node.name;
         }
 
-        internal abstract void Evaluate();
+        internal abstract void Evaluate(Context context);
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,12 +29,21 @@ namespace OpenRPA.Interpreter
 
         internal MetaFile Meta { get; private set; }
 
+        internal string ServerUrl { get; private set; }
+
         private string path;
 
         private string dest;
 
-        internal static RobotFile Load(string path)
+        internal static RobotFile Download(string serverUrl, string robotId, string destinationDir)
         {
+            var path = Path.Combine(destinationDir, robotId + ".rpa");
+
+            if (!File.Exists(path))
+            {
+                Fetch(serverUrl, robotId, path);
+            }
+
             string dest = DecompressFile(path);
 
             MetaFile meta;
@@ -47,7 +57,31 @@ namespace OpenRPA.Interpreter
                 meta = JsonConvert.DeserializeObject<MetaFile>(r.ReadToEnd());
             }
 
-            return new RobotFile(path, dest, meta);
+            return new RobotFile(path, dest)
+            {
+                Meta = meta,
+                ServerUrl = serverUrl,
+            };
+        }
+
+        private static void Fetch(string serverUrl, string robotId, string savePath)
+        {
+            using (var client = new HttpClient())
+            {
+                var url = serverUrl + "/workflow/" + robotId;
+                var response = client.GetAsync(url).Result;
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("Failed to download robot");
+                }
+
+                var stream = response.Content.ReadAsStreamAsync().Result;
+
+                using (var f = File.Create(savePath))
+                {
+                    stream.CopyTo(f);
+                }
+            }
         }
 
         private static string DecompressFile(string path)
@@ -66,11 +100,10 @@ namespace OpenRPA.Interpreter
             return dest;
         }
 
-        internal RobotFile(string path, string dest, MetaFile meta)
+        internal RobotFile(string path, string dest)
         {
             this.path = path;
             this.dest = dest;
-            this.Meta = meta;
         }
 
         internal string GetAbsolutePath(string relativePath)

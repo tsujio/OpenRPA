@@ -15,7 +15,7 @@ namespace OpenRPA.Interpreter.Wml
         {
         }
 
-        internal override void Evaluate()
+        internal override void Evaluate(Context context)
         {
         }
     }

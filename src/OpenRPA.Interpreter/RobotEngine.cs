@@ -14,14 +14,6 @@ namespace OpenRPA.Interpreter
 
         private string robotId;
 
-        private string RobotDownloadUrl
-        {
-            get
-            {
-                return this.serverUrl + "/workflow/" + this.robotId;
-            }
-        }
-
         private string TempAppDir
         {
             get
@@ -35,14 +27,6 @@ namespace OpenRPA.Interpreter
             get
             {
                 return Path.Combine(TempAppDir, "cache");
-            }
-        }
-
-        private string RobotFileName
-        {
-            get
-            {
-                return robotId + ".rpa";
             }
         }
 
@@ -64,40 +48,10 @@ namespace OpenRPA.Interpreter
                 Directory.CreateDirectory(RobotCacheDir);
             }
 
-            string path = DownloadRobot();
-
-            var robotFile = RobotFile.Load(path);
+            var robotFile = RobotFile.Download(serverUrl, robotId, RobotCacheDir);
 
             var interp = new WorkflowInterpreter(robotFile);
             interp.Start();
-        }
-
-        private string DownloadRobot()
-        {
-            var path = Path.Combine(RobotCacheDir, RobotFileName);
-
-            if (File.Exists(path))
-            {
-                return path;
-            }
-
-            using (var client = new HttpClient())
-            {
-                var response = client.GetAsync(RobotDownloadUrl).Result;
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception("Failed to download robot");
-                }
-
-                var stream = response.Content.ReadAsStreamAsync().Result;
-
-                using (var f = File.Create(path))
-                {
-                    stream.CopyTo(f);
-                }
-
-                return path;
-            }
         }
     }
 }

@@ -22,6 +22,9 @@ namespace OpenRPA.Interpreter
         {
             var programPath = robotFile.GetAbsolutePath(robotFile.Meta.Program);
 
+            var context = new Context();
+            context.Helper.GetFullUrl = (path) => robotFile.ServerUrl + path;
+
             JArray workflow;
             using (var f = File.OpenRead(programPath))
             using (var r = new StreamReader(f))
@@ -31,7 +34,7 @@ namespace OpenRPA.Interpreter
 
             foreach (var node in workflow.Select(jToken => WmlNode.Parse(jToken)))
             {
-                node.Evaluate();
+                node.Evaluate(context);
             }
         }
     }
