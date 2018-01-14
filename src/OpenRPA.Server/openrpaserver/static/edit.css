@@ -23,8 +23,6 @@
 
 .node-class,
 .node-instance .instance-area {
-    width: 150px;
-    height: 60px;
     background: #eeeeef;
     border: 1px solid #346789;
     display: flex;
@@ -35,11 +33,26 @@
 }
 
 /*
+ * Node class
+ */
+
+.node-class {
+    width: 150px;
+    height: 40px;
+    margin-top: 10px;
+}
+
+/*
  * Node instance
  */
 
 .node-instance.hidden {
     display: none;
+}
+
+.node-instance .instance-area {
+    width: 150px;
+    height: 60px;
 }
 
 .node-instance .instance-area.selected {
