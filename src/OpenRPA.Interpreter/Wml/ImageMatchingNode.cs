@@ -53,6 +53,15 @@ namespace OpenRPA.Interpreter.Wml
             Bitmap bmp = window.CaptureWindow();
 
             Rectangle matchingRect = FindMatchingRect(bmp, matchingImage);
+
+            var windowRect = window.GetRectangle();
+
+            var mouse = new MouseModel();
+            mouse.Move(
+                windowRect.X + matchingRect.X + matchingRect.Width / 2,
+                windowRect.Y + matchingRect.Y + matchingRect.Height / 2,
+                MouseModel.MouseActionType.LeftClick
+            );
         }
 
         private Stream FetchCapturedImage(string url)

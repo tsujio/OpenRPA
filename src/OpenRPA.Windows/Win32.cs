@@ -130,5 +130,25 @@ namespace OpenRPA.Windows
 
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetCursorPos(int x, int y);
+
+        [DllImport("user32.dll")]
+        internal static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
+
+        internal const uint MOUSEEVENTF_ABSOLUTE = 0x8000;
+        internal const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
+        internal const uint MOUSEEVENTF_LEFTUP = 0x0004;
+        internal const uint MOUSEEVENTF_MIDDLEDOWN = 0x0020;
+        internal const uint MOUSEEVENTF_MIDDLEUP = 0x0040;
+        internal const uint MOUSEEVENTF_MOVE = 0x0001;
+        internal const uint MOUSEEVENTF_RIGHTDOWN = 0x0008;
+        internal const uint MOUSEEVENTF_RIGHTUP = 0x0010;
+        internal const uint MOUSEEVENTF_XDOWN = 0x0080;
+        internal const uint MOUSEEVENTF_XUP = 0x0100;
+        internal const uint MOUSEEVENTF_WHEEL = 0x0800;
+        internal const uint MOUSEEVENTF_HWHEEL = 0x01000;
     }
 }
