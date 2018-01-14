@@ -132,6 +132,7 @@ window.onload = function() {
         // Node classes for making workflow
         nodeClasses: [
           {type: 'ImageMatching', displayType: 'Image Matching'},
+          {type: 'KeyboardInput', displayType: 'Keyboard Input'},
         ],
       };
     },
@@ -176,15 +177,17 @@ window.onload = function() {
             type: nodeInfo.type,
             displayType: nodeInfo.displayType,
             name: nodeInfo.displayType,
-
-            // TODO
-            prop: {
-              imageUrlPath: "",
-              startPos: [0, 0],
-              endPos: [0, 0],
-              windowTitle: "",
-            }
           };
+
+          switch (nodeInstance.type) {
+          case 'ImageMatching':
+            nodeInstance.prop = this.getNewImageMatchingNodeProperties();
+            break;
+
+          case 'KeyboardInput':
+            nodeInstance.prop = this.getNewKeyboardInputNodeProperties();
+            break;
+          }
         }
 
         if (action === 'move') {
@@ -203,6 +206,21 @@ window.onload = function() {
         });
 
         return false;
+      },
+
+      getNewImageMatchingNodeProperties: function() {
+        return {
+          imageUrlPath: "",
+          startPos: [0, 0],
+          endPos: [0, 0],
+          windowTitle: "",
+        };
+      },
+
+      getNewKeyboardInputNodeProperties: function() {
+        return {
+          keys: "",
+        };
       },
 
       onNodePropertyChange: function(e) {
@@ -476,6 +494,12 @@ window.onload = function() {
         this.isMouseDown = false;
       },
     },
+  });
+
+  Vue.component('rpa-keyboard-input-node-property', {
+    template: '#tmpl-keyboard-input-node-property',
+
+    props: ['nodeInstance'],
   });
 
   new Vue({

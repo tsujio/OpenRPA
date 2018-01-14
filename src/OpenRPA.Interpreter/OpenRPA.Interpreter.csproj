@@ -52,6 +52,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -66,6 +67,7 @@
     <Compile Include="RobotFile.cs" />
     <Compile Include="Wml\EndNode.cs" />
     <Compile Include="Wml\ImageMatchingNode.cs" />
+    <Compile Include="Wml\KeyboardInputNode.cs" />
     <Compile Include="Wml\StartNode.cs" />
     <Compile Include="Wml\WmlNode.cs" />
     <Compile Include="WorkflowInterpreter.cs" />

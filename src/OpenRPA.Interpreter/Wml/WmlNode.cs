@@ -33,6 +33,9 @@ namespace OpenRPA.Interpreter.Wml
                 case ImageMatchingNode.TYPE:
                     return new ImageMatchingNode(node);
 
+                case KeyboardInputNode.TYPE:
+                    return new KeyboardInputNode(node);
+
                 default:
                     throw new Exception($"Unknown node type: {type}");
             }

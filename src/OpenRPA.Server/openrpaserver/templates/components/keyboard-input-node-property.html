@@ -1,0 +1,11 @@
+<script type="text/template" id="tmpl-keyboard-input-node-property">
+  <div class="keyboard-input-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <mdc-textfield v-model="nodeInstance.prop.keys"
+                   class="keys" label="Keys" />
+  </div>
+</script>
