@@ -78,7 +78,7 @@ namespace OpenRPA.Interpreter
 
                 var stream = response.Content.ReadAsStreamAsync().Result;
 
-                var path = Path.Combine(TempAppDir, RobotFileName);
+                var path = Path.Combine(RobotCacheDir, RobotFileName);
                 using (var f = File.Create(path))
                 {
                     stream.CopyTo(f);
