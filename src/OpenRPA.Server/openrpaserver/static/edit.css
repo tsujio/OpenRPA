@@ -124,6 +124,8 @@
     box-sizing: border-box;
     background: #eee;
     border-left: 1px solid #ccc;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .node-property-panel.hidden {
@@ -149,7 +151,9 @@
 }
 
 .image-matching-node-property .select-area-notice {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: absolute;
     background: black;
     opacity: 0.8;
