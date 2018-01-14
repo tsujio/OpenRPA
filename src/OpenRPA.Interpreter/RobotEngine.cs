@@ -48,6 +48,7 @@ namespace OpenRPA.Interpreter
 
         public RobotEngine(string serverUrl, string robotId)
         {
+            // TODO: validate input
             this.serverUrl = serverUrl;
             this.robotId = robotId;
         }
@@ -63,14 +64,24 @@ namespace OpenRPA.Interpreter
                 Directory.CreateDirectory(RobotCacheDir);
             }
 
-            string path = DownloadRobot(RobotDownloadUrl);
+            string path = DownloadRobot();
+
+            var robotFile = RobotFile.Load(path);
+            string programPath = robotFile.GetAbsolutePath(robotFile.Meta.Program);
         }
 
-        private string DownloadRobot(string url)
+        private string DownloadRobot()
         {
+            var path = Path.Combine(RobotCacheDir, RobotFileName);
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
             using (var client = new HttpClient())
             {
-                var response = client.GetAsync(url).Result;
+                var response = client.GetAsync(RobotDownloadUrl).Result;
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new Exception("Failed to download robot");
@@ -78,7 +89,6 @@ namespace OpenRPA.Interpreter
 
                 var stream = response.Content.ReadAsStreamAsync().Result;
 
-                var path = Path.Combine(RobotCacheDir, RobotFileName);
                 using (var f = File.Create(path))
                 {
                     stream.CopyTo(f);
