@@ -7,14 +7,15 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace OpenRPA.Capture
 {
-    public class WindowCapturer
+    public class WindowCapturer : IDisposable
     {
         public event Action Finish;
 
-        private MouseHook mouseHook;
+        private HotKey hotKey;
 
         private string serverUrl;
 
@@ -57,21 +58,17 @@ namespace OpenRPA.Capture
 
         public void CaptureAndSend()
         {
-            // Store MouseHook object to instance field not to be garbage collected.
-            // This instance is referenced by native code (SetWindowsHookEx).
-            // If native code refers GCed object, application will crash.
-            mouseHook = new MouseHook(MouseHook.HookType.LeftClick);
-
-            mouseHook.MouseEvent += OnMouseLeftClickEvent;
-
-            mouseHook.Start();
+            hotKey = new HotKey(HotKey.MOD_KEY.CONTROL | HotKey.MOD_KEY.ALT, Keys.F5);
+            hotKey.HotKeyPush += OnHotKeyPush;
         }
 
-        private void OnMouseLeftClickEvent(int x, int y)
+        private void OnHotKeyPush(object sender, EventArgs e)
         {
-            mouseHook.Stop();
+            var mouse = new MouseModel();
+            int x = mouse.Position.X;
+            int y = mouse.Position.Y;
 
-            // Capture window at clicked point
+            // Capture window where cursor points
             WindowModel w = WindowModel.FindByPosition(x, y);
             Bitmap bmp = w.CaptureWindow();
 
@@ -95,10 +92,14 @@ namespace OpenRPA.Capture
                         throw new Exception("Sending captured image failed");
                     }
                 }
-
             }
 
             Finish();
+        }
+
+        public void Dispose()
+        {
+            hotKey.Dispose();
         }
     }
 }

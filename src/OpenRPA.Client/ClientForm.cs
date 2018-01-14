@@ -17,6 +17,8 @@ namespace OpenRPA.Client
     {
         private bool hasBeenCommandExecuted = false;
 
+        private IDisposable commandObject;
+
         private string serverUrl = ConfigurationManager.AppSettings["serverUrl"];
 
         public ClientForm()
@@ -74,39 +76,36 @@ namespace OpenRPA.Client
             }
         }
 
-        // This is used for keeping command object in memory while executing command and
-        // not to be garbage collected by wrapping it.
-        private Action commandAction;
-
         private void DoExecuteCommand(string schema, string command, string option)
         {
             var engine = new RobotEngine(serverUrl, option);
 
-            commandAction = () =>
-            {
-                engine.Execute();
+            this.commandObject = engine;
 
-                this.Close();
-            };
+            engine.Execute();
 
-            commandAction();
+            this.Close();
         }
 
         private void DoCaptureCommand(string schema, string command, string option)
         {
             var w = new WindowCapturer(serverUrl, option);
 
-            commandAction = () =>
-            {
-                w.Finish += () =>
-                {
-                    this.Close();
-                };
+            this.commandObject = w;
 
-                w.CaptureAndSend();
+            w.Finish += () =>
+            {
+                this.Close();
             };
 
-            commandAction();
+            w.CaptureAndSend();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            this.commandObject.Dispose();
+
+            base.OnClosed(e);
         }
     }
 }

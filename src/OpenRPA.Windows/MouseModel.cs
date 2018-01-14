@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace OpenRPA.Windows
 {
@@ -13,6 +14,17 @@ namespace OpenRPA.Windows
             None,
             LeftClick,
         }
+
+        public class PositionClass
+        {
+            public int X { get => Cursor.Position.X; }
+
+            public int Y { get => Cursor.Position.Y; }
+        }
+
+        private PositionClass position = new PositionClass();
+
+        public PositionClass Position { get => position; }
 
         public MouseModel()
         {

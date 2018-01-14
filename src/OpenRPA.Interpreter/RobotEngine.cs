@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenRPA.Interpreter
 {
-    public class RobotEngine
+    public class RobotEngine : IDisposable
     {
         private string serverUrl;
 
@@ -52,6 +52,10 @@ namespace OpenRPA.Interpreter
 
             var interp = new WorkflowInterpreter(robotFile);
             interp.Start();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

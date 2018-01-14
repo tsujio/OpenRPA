@@ -150,5 +150,12 @@ namespace OpenRPA.Windows
         internal const uint MOUSEEVENTF_XUP = 0x0100;
         internal const uint MOUSEEVENTF_WHEEL = 0x0800;
         internal const uint MOUSEEVENTF_HWHEEL = 0x01000;
+
+        [DllImport("user32.dll")]
+        internal static extern int RegisterHotKey(IntPtr hWnd, int id, HotKey.MOD_KEY fsModifiers, System.Windows.Forms.Keys vk);
+
+        [DllImport("user32.dll")]
+        internal static extern int UnregisterHotKey(IntPtr hWnd, int id);
+
     }
 }
