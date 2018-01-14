@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenRPA.Interpreter
 {
-    public class RobotInterpreter
+    public class RobotEngine
     {
         private string serverUrl;
 
@@ -46,7 +46,7 @@ namespace OpenRPA.Interpreter
             }
         }
 
-        public RobotInterpreter(string serverUrl, string robotId)
+        public RobotEngine(string serverUrl, string robotId)
         {
             this.serverUrl = serverUrl;
             this.robotId = robotId;

@@ -80,11 +80,11 @@ namespace OpenRPA.Client
 
         private void DoExecuteCommand(string schema, string command, string option)
         {
-            var interp = new RobotInterpreter(serverUrl, option);
+            var engine = new RobotEngine(serverUrl, option);
 
             commandAction = () =>
             {
-                interp.Execute();
+                engine.Execute();
 
                 this.Close();
             };
