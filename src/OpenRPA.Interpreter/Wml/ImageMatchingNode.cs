@@ -14,6 +14,8 @@ namespace OpenRPA.Interpreter.Wml
 {
     internal class ImageMatchingNode : WmlNode
     {
+        internal const string TYPE = "ImageMatching";
+
         internal string ImageUrlPath { get; private set; }
 
         internal IList<int> StartPos { get; private set; }
@@ -22,7 +24,7 @@ namespace OpenRPA.Interpreter.Wml
 
         internal string WindowTitle { get; private set; }
 
-        internal const string TYPE = "ImageMatching";
+        internal string Action { get; private set; }
 
         internal ImageMatchingNode(dynamic node) : base(node as JToken)
         {
@@ -32,6 +34,7 @@ namespace OpenRPA.Interpreter.Wml
             StartPos = (prop.startPos as JArray).ToObject<IList<int>>();
             EndPos = (prop.endPos as JArray).ToObject<IList<int>>();
             WindowTitle = prop.windowTitle;
+            Action = prop.action;
         }
 
         internal override void Evaluate(Context context)
@@ -57,10 +60,30 @@ namespace OpenRPA.Interpreter.Wml
             var windowRect = window.GetRectangle();
 
             var mouse = new MouseModel();
+
+            MouseModel.MouseActionType action;
+            switch (Action)
+            {
+                case "LeftClick":
+                    action = MouseModel.MouseActionType.LeftClick;
+                    break;
+
+                case "RightClick":
+                    action = MouseModel.MouseActionType.RightClick;
+                    break;
+
+                case "DoubleLeftClick":
+                    action = MouseModel.MouseActionType.DoubleLeftClick;
+                    break;
+
+                default:
+                    throw new Exception($"Unknown action {Action}");
+            }
+
             mouse.Move(
                 windowRect.X + matchingRect.X + matchingRect.Width / 2,
                 windowRect.Y + matchingRect.Y + matchingRect.Height / 2,
-                MouseModel.MouseActionType.LeftClick
+                action
             );
         }
 

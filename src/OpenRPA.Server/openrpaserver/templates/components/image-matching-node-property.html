@@ -7,13 +7,21 @@
 
     <mdc-fab icon="camera_alt" mini class="capture-button" @click="onCaptureButtonClick"></mdc-fab>
 
-    <div class="capture-image-container" :class="{hidden: !hasImage}" @click="onCaptureImageClick">
-      <span class="select-area-notice" :class="{hidden: hasRect}">Click here and select matching area.</span>
-      <img :src="nodeInstance.prop.imageUrlPath" class="capture-image" />
-    </div>
+    <div class="hidden-until-receive-capture" :class="{hidden: !hasImage}">
+      <div class="capture-image-container" @click="onCaptureImageClick">
+        <span class="select-area-notice" :class="{hidden: hasRect}">Click here and select matching area.</span>
+        <img :src="nodeInstance.prop.imageUrlPath" class="capture-image" />
+      </div>
 
     <mdc-textfield v-model="nodeInstance.prop.windowTitle"
-                   class="window-title" :class="{hidden: !hasImage}" label="Window title" />
+                   class="window-title" label="Window title" />
+
+    <mdc-select v-model="nodeInstance.prop.action" label="Please select action"
+                class="action">
+      <mdc-option value="LeftClick">Left Click</mdc-option>
+      <mdc-option value="RightClick">Right Click</mdc-option>
+      <mdc-option value="DoubleLeftClick">Double Left Click</mdc-option>
+    </mdc-select>
 
     <rpa-image-matching-capture-image-dialog
         ref="captureImageDialog"

@@ -13,6 +13,8 @@ namespace OpenRPA.Windows
         {
             None,
             LeftClick,
+            RightClick,
+            DoubleLeftClick,
         }
 
         public class PositionClass
@@ -39,6 +41,14 @@ namespace OpenRPA.Windows
                 case MouseActionType.LeftClick:
                     LeftClick();
                     break;
+
+                case MouseActionType.RightClick:
+                    RightClick();
+                    break;
+
+                case MouseActionType.DoubleLeftClick:
+                    DoubleLeftClick();
+                    break;
             }
         }
 
@@ -46,6 +56,18 @@ namespace OpenRPA.Windows
         {
             Win32.mouse_event(Win32.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
             Win32.mouse_event(Win32.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        }
+
+        public static void RightClick()
+        {
+            Win32.mouse_event(Win32.MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
+            Win32.mouse_event(Win32.MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+        }
+
+        public static void DoubleLeftClick()
+        {
+            LeftClick();
+            LeftClick();
         }
     }
 }
