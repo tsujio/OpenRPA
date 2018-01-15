@@ -43,12 +43,16 @@ namespace OpenRPA.Interpreter.Wml
             var stream = FetchCapturedImage(url);
 
             Bitmap originalCapture = Image.FromStream(stream) as Bitmap;
-            Bitmap matchingImage = new Bitmap(EndPos[0] - StartPos[0], EndPos[1] - StartPos[1]);
+            Bitmap matchingImage = new Bitmap(
+                Math.Abs(EndPos[0] - StartPos[0]),
+                Math.Abs(EndPos[1] - StartPos[1])
+            );
             using (Graphics g = Graphics.FromImage(matchingImage))
             {
                 g.DrawImage(originalCapture,
                     new Rectangle(0, 0, matchingImage.Width, matchingImage.Height),
-                    new Rectangle(StartPos[0], StartPos[1], matchingImage.Width, matchingImage.Height),
+                    new Rectangle(Math.Min(StartPos[0], EndPos[0]), Math.Min(StartPos[1], EndPos[1]),
+                        matchingImage.Width, matchingImage.Height),
                     GraphicsUnit.Pixel);
             }
 
