@@ -56,6 +56,17 @@ namespace OpenRPA.Windows
         [DllImport("user32.dll")]
         internal static extern IntPtr WindowFromPoint(System.Drawing.Point p);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        internal static extern int GetWindowTextLength(IntPtr hWnd);
+
+        internal delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        internal static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
+
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool IsIconic(IntPtr hWnd);
@@ -157,5 +168,13 @@ namespace OpenRPA.Windows
         [DllImport("user32.dll")]
         internal static extern int UnregisterHotKey(IntPtr hWnd, int id);
 
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetDC(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        internal static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
+        [DllImport("user32.dll", SetLastError = false)]
+        internal static extern IntPtr GetDesktopWindow();
     }
 }

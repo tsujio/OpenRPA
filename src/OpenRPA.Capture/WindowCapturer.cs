@@ -17,6 +17,8 @@ namespace OpenRPA.Capture
 
         private HotKey hotKey;
 
+        private System.Timers.Timer timer;
+
         private string serverUrl;
 
         private string uploadToken;
@@ -58,8 +60,15 @@ namespace OpenRPA.Capture
 
         public void CaptureAndSend()
         {
+            // Set up hot key
             hotKey = new HotKey(HotKey.MOD_KEY.CONTROL | HotKey.MOD_KEY.ALT, Keys.F5);
             hotKey.HotKeyPush += OnHotKeyPush;
+
+            timer = new System.Timers.Timer();
+            timer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimeElapsed);
+            timer.Interval = 100;
+            timer.AutoReset = true;
+            timer.Enabled = true;
         }
 
         private void OnHotKeyPush(object sender, EventArgs e)
@@ -97,9 +106,26 @@ namespace OpenRPA.Capture
             Finish();
         }
 
+        private WindowModel prevWindow;
+
+        private void OnTimeElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            var mouse = new MouseModel();
+            var window = WindowModel.FindByPositionOrNull(mouse.Position.X, mouse.Position.Y);
+
+            if (window != null && !window.Equals(prevWindow))
+            {
+                var rect = window.GetRectangle();
+                WindowModel.DrawRect(rect.X, rect.Y, rect.Width, rect.Height);
+
+                prevWindow = window;
+            }
+        }
+
         public void Dispose()
         {
             hotKey.Dispose();
+            timer.Enabled = false;
         }
     }
 }

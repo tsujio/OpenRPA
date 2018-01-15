@@ -11,54 +11,98 @@ namespace OpenRPA.Windows
 {
     public class WindowModel
     {
-        private Process process;
+        private IntPtr hWnd;
 
-        private IntPtr HWnd
-        {
-            get
-            {
-                return this.process.MainWindowHandle;
-            }
-        }
+        private string windowTitle;
 
-        public string WindowTitle
-        {
-            get
-            {
-                return this.process.MainWindowTitle;
-            }
-        }
+        public string WindowTitle { get => windowTitle; }
 
-        public static WindowModel FindByPosition(int x, int y)
+        public static WindowModel FindByPositionOrNull(int x, int y)
         {
             IntPtr hWnd = Win32.WindowFromPoint(new Point(x, y));
             if (hWnd == IntPtr.Zero)
             {
+                return null;
+            }
+
+            return new WindowModel(hWnd);
+        }
+
+        public static WindowModel FindByPosition(int x, int y)
+        {
+            var window = FindByPositionOrNull(x, y);
+            if (window == null)
+            {
                 throw new Exception($"Window at ({x}, {y}) not found");
             }
 
-            Win32.GetWindowThreadProcessId(hWnd, out uint pid);
-            var proc = Process.GetProcessById((int)pid);
-
-            return new WindowModel(proc);
+            return window;
         }
 
         public static WindowModel FindByTitle(string title)
         {
-            foreach (var p in Process.GetProcesses())
+            WindowModel window = null;
+
+            Win32.EnumWindows((IntPtr hWnd, IntPtr lParam) =>
             {
-                if (p.MainWindowTitle.Contains(title))
+                var w = new WindowModel(hWnd);
+                if (w.WindowTitle.Contains(title))
                 {
-                    return new WindowModel(p);
+                    window = w;
+
+                    // Stop iteration
+                    return false;
                 }
+
+                // Next iteration
+                return true;
+            }, IntPtr.Zero);
+
+            if (window == null)
+            {
+                throw new Exception($"Window '{title}' not found");
             }
 
-            throw new Exception($"Window '{title}' not found");
+            return window;
         }
 
-        private WindowModel(Process process)
+        public static void DrawRect(int x, int y, int width, int height)
         {
-            this.process = process;
+            IntPtr desktopPtr = Win32.GetDC(IntPtr.Zero);
+
+            using (Graphics g = Graphics.FromHdc(desktopPtr))
+            using (var tp = new Pen(Color.Transparent, 0))
+            using (var p = new Pen(Color.LimeGreen, 6))
+            {
+                // Clear previous drawn rect
+                Win32.RECT r;
+                if (!Win32.GetWindowRect(Win32.GetDesktopWindow(), out r))
+                {
+                    throw new Exception("Failed to get window rect");
+                }
+                var screenRect = new Rectangle(r.left, r.top, r.right - r.left, r.bottom - r.top);
+                g.DrawRectangle(tp, screenRect);
+
+                // Draw rect
+                g.DrawRectangle(p, new Rectangle(x, y, width, height));
+            }
+            Win32.ReleaseDC(IntPtr.Zero, desktopPtr);
+        }
+
+        private WindowModel(IntPtr hWnd)
+        {
+            this.hWnd = hWnd;
+            this.windowTitle = "";
+
+            int size = Win32.GetWindowTextLength(hWnd);
+            if (size > 0)
+            {
+                var sb = new StringBuilder(size + 1);
+                if (Win32.GetWindowText(hWnd, sb, sb.Capacity) > 0)
+                {
+                    this.windowTitle = sb.ToString();
+                }
+            }
         }
 
         internal void TryBringToForeground()
@@ -66,18 +110,18 @@ namespace OpenRPA.Windows
             // Reference: https://dobon.net/vb/dotnet/process/appactivate.html
 
             // Show window if minimized
-            if (Win32.IsIconic(this.HWnd))
+            if (Win32.IsIconic(this.hWnd))
             {
-                Win32.ShowWindowAsync(this.HWnd, Win32.SW_RESTORE);
+                Win32.ShowWindowAsync(this.hWnd, Win32.SW_RESTORE);
             }
 
-            IntPtr hWnd = Win32.GetForegroundWindow();
-            if (hWnd == this.HWnd)
+            IntPtr hForeWnd = Win32.GetForegroundWindow();
+            if (hForeWnd == this.hWnd)
             {
                 return;
             }
 
-            uint foreThread = Win32.GetWindowThreadProcessId(hWnd, IntPtr.Zero);
+            uint foreThread = Win32.GetWindowThreadProcessId(hForeWnd, IntPtr.Zero);
             uint thisThread = Win32.GetCurrentThreadId();
             uint timeout = 200000;
             if (foreThread != thisThread)
@@ -90,12 +134,12 @@ namespace OpenRPA.Windows
             }
 
             // Try bring window to foreground
-            Win32.SetForegroundWindow(this.HWnd);
-            Win32.SetWindowPos(this.HWnd, Win32.HWND_TOP, 0, 0, 0, 0,
+            Win32.SetForegroundWindow(this.hWnd);
+            Win32.SetWindowPos(this.hWnd, Win32.HWND_TOP, 0, 0, 0, 0,
                 Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_SHOWWINDOW | Win32.SWP_ASYNCWINDOWPOS);
-            Win32.BringWindowToTop(this.HWnd);
-            Win32.ShowWindowAsync(this.HWnd, Win32.SW_SHOW);
-            Win32.SetFocus(this.HWnd);
+            Win32.BringWindowToTop(this.hWnd);
+            Win32.ShowWindowAsync(this.hWnd, Win32.SW_SHOW);
+            Win32.SetFocus(this.hWnd);
 
             // Restore ForegroundLockTimeout
             if (foreThread != thisThread)
@@ -107,7 +151,7 @@ namespace OpenRPA.Windows
         public Rectangle GetRectangle()
         {
             Win32.RECT r;
-            if (!Win32.GetWindowRect(this.HWnd, out r))
+            if (!Win32.GetWindowRect(this.hWnd, out r))
             {
                 throw new Exception("Failed to get window rect");
             }
@@ -129,6 +173,18 @@ namespace OpenRPA.Windows
             }
 
             return bmp;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as WindowModel;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            return this.hWnd.Equals(other.hWnd);
         }
     }
 }
