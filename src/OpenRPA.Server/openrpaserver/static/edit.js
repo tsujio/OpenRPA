@@ -225,7 +225,9 @@ window.onload = function() {
       },
 
       onNodePropertyChange: function(e) {
-        for (var node of this.workflow) {
+        for (var i = 0; i < this.workflow.length; i++) {
+          let node = this.workflow[i];
+
           if (node.id === e.id) {
             node.name = e.name;
             node.prop = e.prop;
