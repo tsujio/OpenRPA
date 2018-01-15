@@ -319,7 +319,7 @@ window.onload = function() {
     methods: {
       onCaptureButtonClick: function() {
         var self = this;
-        var socket = io.connect("http://localhost:5555/capture");
+        var socket = io.connect("/capture");
 
         // TODO: socket error handling
         socket.on('connect', function() {

@@ -4,6 +4,9 @@ This script runs the openrpaserver application using a development server.
 
 from os import environ
 from openrpaserver import app, socketio
+import eventlet
+eventlet.monkey_patch()
+
 
 if __name__ == '__main__':
     HOST = environ.get('SERVER_HOST', 'localhost')
