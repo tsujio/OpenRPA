@@ -16,6 +16,10 @@ REDIS_VERSION=3.2
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+if [ $DEBUG == '1' ]; then
+    extra_args="-e FLASK_DEBUG=1 -v $script_dir/..:/app"
+fi
+
 if [ $# -gt 0 ]; then
     PORT=$1
 fi
@@ -79,6 +83,7 @@ docker run \
        --rm \
        -p $PORT:80 \
        -d \
+       $extra_args \
        $OPENRPA_NAME \
        || exit 1
 
