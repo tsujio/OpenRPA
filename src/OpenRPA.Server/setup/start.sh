@@ -7,7 +7,7 @@ PORT=80
 OPENRPA_NAME=openrpa
 
 MYSQL_NAME=openrpa-mysql
-MYSQL_DATADIR=~/OpenRPA/mysql-data
+MYSQL_DATADIR=~/OpenRPA-data/mysql
 MYSQL_ROOT_PASSWORD=mysql
 MYSQL_VERSION=5.7
 
@@ -15,7 +15,7 @@ REDIS_NAME=openrpa-redis
 REDIS_VERSION=3.2
 
 # TODO: remove
-SQLITE_DATA=~/OpenRPA/openrpa.db
+SQLITE_DATADIR=~/OpenRPA-data/sqlite
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -86,7 +86,7 @@ docker run \
        --rm \
        -p $PORT:80 \
        -d \
-       -v $SQLITE_DATA:/var/lib/OpenRPA/openrpa.db \
+       -v $SQLITE_DATADIR:/var/lib/OpenRPA \
        $extra_args \
        $OPENRPA_NAME \
        || exit 1
