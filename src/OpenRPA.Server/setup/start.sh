@@ -38,7 +38,7 @@ docker stop $REDIS_NAME
 docker build \
        -t $OPENRPA_NAME \
        $build_arg \
-       ../ \
+       $script_dir/../ \
     || exit 1
 
 # Start MySQL
