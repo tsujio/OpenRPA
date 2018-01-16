@@ -467,6 +467,7 @@ window.onload = function() {
           ctx.drawImage(img, 0, 0);
 
           self.drawRect(ctx);
+          self.drawPoint(ctx);
         }
         img.src = this.imageUrlPath;
       },
@@ -479,6 +480,8 @@ window.onload = function() {
             startPos[1] === endPos[1]) {
           return;
         }
+
+        ctx.save();
 
         // Set line style
         ctx.strokeStyle = "#00ff00";
@@ -504,6 +507,39 @@ window.onload = function() {
         ctx.lineTo(startPos[0],endPos[1]);
 
         ctx.stroke();
+
+        ctx.restore();
+      },
+
+      drawPoint: function(ctx) {
+        var startPos = this.startPos;
+        var endPos = this.endPos;
+
+        if (startPos[0] === endPos[0] &&
+            startPos[1] === endPos[1]) {
+          return;
+        }
+
+        ctx.save();
+
+        // Set point style
+        ctx.strokeStyle = ctx.fillStyle = "#00ff00";
+
+        ctx.beginPath();
+
+        // Draw point (small filled circle)
+        ctx.arc(
+          (startPos[0] + endPos[0]) / 2,
+          (startPos[1] + endPos[1]) / 2,
+          5,
+          0,
+          2 * Math.PI
+        );
+        ctx.fill();
+
+        ctx.stroke();
+
+        ctx.restore();
       },
 
       onMouseDown: function(e) {
