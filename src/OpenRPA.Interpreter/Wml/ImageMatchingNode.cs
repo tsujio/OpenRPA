@@ -39,9 +39,11 @@ namespace OpenRPA.Interpreter.Wml
 
         internal override void Evaluate(Context context)
         {
+            // Fetch captured image from server
             var url = context.Helper.GetFullUrl(ImageUrlPath);
             var stream = FetchCapturedImage(url);
 
+            // Extract area to match from image
             Bitmap originalCapture = Image.FromStream(stream) as Bitmap;
             Bitmap matchingImage = new Bitmap(
                 Math.Abs(EndPos[0] - StartPos[0]),
@@ -56,39 +58,43 @@ namespace OpenRPA.Interpreter.Wml
                     GraphicsUnit.Pixel);
             }
 
+            // Capture target window
             var window = WindowModel.FindByTitle(WindowTitle);
             Bitmap bmp = window.CaptureWindow();
 
+            // Find matching area in target window
             Rectangle matchingRect = FindMatchingRect(bmp, matchingImage);
-
-            var windowRect = window.GetRectangle();
 
             var mouse = new MouseModel();
 
-            MouseModel.MouseActionType action;
+            // Move cursor to matching area
+            var windowRect = window.GetRectangle();
+            mouse.Move(
+                windowRect.X + matchingRect.X + matchingRect.Width / 2,
+                windowRect.Y + matchingRect.Y + matchingRect.Height / 2
+            );
+
+            // Do action
             switch (Action)
             {
+                case "Nothing":
+                    break;
+
                 case "LeftClick":
-                    action = MouseModel.MouseActionType.LeftClick;
+                    mouse.LeftClick();
                     break;
 
                 case "RightClick":
-                    action = MouseModel.MouseActionType.RightClick;
+                    mouse.RightClick();
                     break;
 
                 case "DoubleLeftClick":
-                    action = MouseModel.MouseActionType.DoubleLeftClick;
+                    mouse.DoubleLeftClick();
                     break;
 
                 default:
                     throw new Exception($"Unknown action {Action}");
             }
-
-            mouse.Move(
-                windowRect.X + matchingRect.X + matchingRect.Width / 2,
-                windowRect.Y + matchingRect.Y + matchingRect.Height / 2,
-                action
-            );
         }
 
         private Stream FetchCapturedImage(string url)
