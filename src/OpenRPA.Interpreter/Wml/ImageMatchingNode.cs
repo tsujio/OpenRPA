@@ -117,18 +117,24 @@ namespace OpenRPA.Interpreter.Wml
             {
                 Cv2.MatchTemplate(refMat, tmplMat, result, TemplateMatchModes.CCoeffNormed);
 
-                Rectangle retval = Rectangle.Empty;
+                Rectangle rect = Rectangle.Empty;
                 while (true)
                 {
                     double minVal, maxVal;
                     OpenCvSharp.Point minLoc, maxLoc;
                     Cv2.MinMaxLoc(result, out minVal, out maxVal, out minLoc, out maxLoc);
 
-                    if (maxVal - threshold >= -1e-3)
+                    if (maxVal - threshold >= -1e-2)
                     {
-                        retval = new Rectangle(maxLoc.X, maxLoc.Y, tmplMat.Width, tmplMat.Height);
+                        if (!rect.IsEmpty)
+                        {
+                            throw new Exception("Matched multiple locations");
+                        }
+
+                        rect = new Rectangle(maxLoc.X, maxLoc.Y, tmplMat.Width, tmplMat.Height);
 
                         // Fill in the res Mat so you don't find the same area again in the MinMaxLoc
+                        // TODO: Prefer inversed tmplMat to Scalar(0)
                         result.FloodFill(maxLoc, new Scalar(0));
                     }
                     else
@@ -137,12 +143,12 @@ namespace OpenRPA.Interpreter.Wml
                     }
                 }
 
-                if (retval.IsEmpty)
+                if (rect.IsEmpty)
                 {
                     throw new Exception("Image matching failed");
                 }
 
-                return retval;
+                return rect;
             }
         }
     }
