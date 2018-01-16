@@ -113,10 +113,12 @@ namespace OpenRPA.Capture
             var mouse = new MouseModel();
             var window = WindowModel.FindByPositionOrNull(mouse.Position.X, mouse.Position.Y);
 
-            if (window != null && !window.Equals(prevWindow))
+            if (window != null)
             {
                 var rect = window.GetRectangle();
-                WindowModel.DrawRect(rect.X, rect.Y, rect.Width, rect.Height);
+
+                var clearBeforeDraw = !window.Equals(prevWindow);
+                WindowModel.DrawRect(rect.X, rect.Y, rect.Width, rect.Height, clearBeforeDraw);
 
                 prevWindow = window;
             }

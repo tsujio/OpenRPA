@@ -70,14 +70,17 @@ namespace OpenRPA.Windows
             return windows.First();
         }
 
-        public static void DrawRect(int x, int y, int width, int height)
+        public static void DrawRect(int x, int y, int width, int height, bool clearBeforeDraw)
         {
             IntPtr desktopPtr = Win32.GetDC(IntPtr.Zero);
 
             using (Graphics g = Graphics.FromHdc(desktopPtr))
             using (var p = new Pen(Color.LimeGreen, 6))
             {
-                ClearRect();
+                if (clearBeforeDraw)
+                {
+                    ClearRect();
+                }
 
                 // Draw rect
                 g.DrawRectangle(p, new Rectangle(x, y, width, height));
