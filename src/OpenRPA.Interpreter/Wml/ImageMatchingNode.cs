@@ -9,9 +9,18 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using System.Diagnostics;
 
 namespace OpenRPA.Interpreter.Wml
 {
+    internal class ImageMatchingFailedException : Exception
+    {
+        internal ImageMatchingFailedException(string message) : base(message)
+        {
+        }
+    }
+
     internal class ImageMatchingNode : WmlNode
     {
         internal const string TYPE = "ImageMatching";
@@ -26,6 +35,8 @@ namespace OpenRPA.Interpreter.Wml
 
         internal string Action { get; private set; }
 
+        internal int Timeout { get; private set; }
+
         internal ImageMatchingNode(dynamic node) : base(node as JToken)
         {
             var prop = node.prop.ToObject<dynamic>();
@@ -35,10 +46,13 @@ namespace OpenRPA.Interpreter.Wml
             EndPos = (prop.endPos as JArray).ToObject<IList<int>>();
             WindowTitle = prop.windowTitle;
             Action = prop.action;
+            Timeout = prop.timeout;
         }
 
         internal override void Evaluate(Context context)
         {
+            // TODO: Refactor
+            
             // Fetch captured image from server
             var url = context.Helper.GetFullUrl(ImageUrlPath);
             var stream = FetchCapturedImage(url);
@@ -58,12 +72,57 @@ namespace OpenRPA.Interpreter.Wml
                     GraphicsUnit.Pixel);
             }
 
-            // Capture target window
-            var window = WindowModel.FindByTitle(WindowTitle);
-            Bitmap bmp = window.CaptureWindow();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            // Find matching area in target window
-            Rectangle matchingRect = FindMatchingRect(bmp, matchingImage);
+            WindowModel window;
+            Rectangle matchingRect;
+            while (true)
+            {
+                Bitmap bmp;
+                try
+                {
+                    // Capture target window
+                    window = WindowModel.FindByTitle(WindowTitle);
+                    bmp = window.CaptureWindow();
+                }
+                catch (WindowNotFoundException)
+                {
+                    stopwatch.Stop();
+                    if (stopwatch.Elapsed.TotalSeconds > Timeout)
+                    {
+                        throw;
+                    }
+
+                    Thread.Sleep(500);
+
+                    // Retry
+                    stopwatch.Start();
+                    continue;
+                }
+
+                try
+                {
+                    // Find matching area in target window
+                    matchingRect = FindMatchingRect(bmp, matchingImage);
+                }
+                catch (ImageMatchingFailedException)
+                {
+                    stopwatch.Stop();
+                    if (stopwatch.Elapsed.TotalSeconds > Timeout)
+                    {
+                        throw;
+                    }
+
+                    Thread.Sleep(500);
+
+                    // Retry
+                    stopwatch.Start();
+                    continue;
+                }
+
+                break;
+            }
 
             var mouse = new MouseModel();
 
@@ -151,7 +210,7 @@ namespace OpenRPA.Interpreter.Wml
 
                 if (rect.IsEmpty)
                 {
-                    throw new Exception("Image matching failed");
+                    throw new ImageMatchingFailedException("Image matching failed");
                 }
 
                 return rect;

@@ -24,6 +24,9 @@
       <mdc-option value="DoubleLeftClick">Double Left Click</mdc-option>
     </mdc-select>
 
+    <mdc-textfield v-model="nodeInstance.prop.timeout"
+                   type="number" min="0" class="timeout" label="Timeout (seconds)" />
+
     <rpa-image-matching-capture-image-dialog
         ref="captureImageDialog"
         :node-instance="nodeInstance"></rpa-image-matching-capture-image-dialog>

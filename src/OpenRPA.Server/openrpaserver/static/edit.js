@@ -241,6 +241,7 @@ window.onload = function() {
           endPos: [0, 0],
           windowTitle: "",
           action: "",
+          timeout: 0,
         };
       },
 

@@ -170,7 +170,8 @@
 }
 
 .image-matching-node-property .window-title,
-.image-matching-node-property .action {
+.image-matching-node-property .action,
+.image-matching-node-property .timeout {
     margin-top: 20px;
 }
 

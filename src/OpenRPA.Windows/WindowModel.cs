@@ -9,6 +9,13 @@ using System.Threading.Tasks;
 
 namespace OpenRPA.Windows
 {
+    public class WindowNotFoundException : Exception
+    {
+        public WindowNotFoundException(string message) : base(message)
+        {
+        }
+    }
+
     public class WindowModel
     {
         private IntPtr hWnd;
@@ -33,7 +40,7 @@ namespace OpenRPA.Windows
             var window = FindByPositionOrNull(x, y);
             if (window == null)
             {
-                throw new Exception($"Window at ({x}, {y}) not found");
+                throw new WindowNotFoundException($"Window at ({x}, {y}) not found");
             }
 
             return window;
@@ -57,7 +64,7 @@ namespace OpenRPA.Windows
 
             if (windows.Count == 0)
             {
-                throw new Exception($"Window '{title}' not found");
+                throw new WindowNotFoundException($"Window '{title}' not found");
             }
 
             return windows.First();
