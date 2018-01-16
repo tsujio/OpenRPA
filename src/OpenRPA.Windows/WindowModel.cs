@@ -41,29 +41,30 @@ namespace OpenRPA.Windows
 
         public static WindowModel FindByTitle(string title)
         {
-            WindowModel window = null;
+            var windows = new List<WindowModel>();
 
             Win32.EnumWindows((IntPtr hWnd, IntPtr lParam) =>
             {
                 var w = new WindowModel(hWnd);
                 if (w.WindowTitle == title)
                 {
-                    window = w;
-
-                    // Stop iteration
-                    return false;
+                    windows.Add(w);
                 }
 
                 // Next iteration
                 return true;
             }, IntPtr.Zero);
 
-            if (window == null)
+            if (windows.Count == 0)
             {
                 throw new Exception($"Window '{title}' not found");
             }
+            if (windows.Count > 1)
+            {
+                throw new Exception($"Window '{title}' found multiply");
+            }
 
-            return window;
+            return windows.First();
         }
 
         public static void DrawRect(int x, int y, int width, int height)
