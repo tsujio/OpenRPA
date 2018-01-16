@@ -39,6 +39,12 @@ window.onload = function() {
           self.isSelected = false;
         }
       });
+
+      bus.$on('workflow-canvas.getselectednode', function(callback) {
+        if (self.isSelected) {
+          callback(self);
+        }
+      });
     },
 
     updated: function() {
@@ -152,6 +158,21 @@ window.onload = function() {
     },
 
     created: function() {
+      var self = this;
+
+      window.addEventListener('keydown', function(e) {
+        var DELETE = 46
+        if (e.keyCode === DELETE) {
+          // Delete selected node
+          bus.$emit('workflow-canvas.getselectednode', function(nodeInstance) {
+            var i = self.findPositionById(nodeInstance.id);
+            if (i !== -1) {
+              self.workflow.splice(i, 1);
+            }
+          });
+        }
+      });
+
       bus.$on('node-instance.click', function(nodeInstance) {
         bus.$emit('workflow-canvas.selectnode', nodeInstance.id);
       });
