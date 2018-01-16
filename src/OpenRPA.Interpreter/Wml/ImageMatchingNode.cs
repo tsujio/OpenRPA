@@ -51,40 +51,66 @@ namespace OpenRPA.Interpreter.Wml
 
         internal override void Evaluate(Context context)
         {
-            // TODO: Refactor
-            
-            // Fetch captured image from server
             var url = context.Helper.GetFullUrl(ImageUrlPath);
-            var stream = FetchCapturedImage(url);
+            Bitmap imageToMatch = GetImageToMatch(url);
 
-            // Extract area to match from image
+            FindWindowAndTryMatch(imageToMatch, out WindowModel window, out Rectangle matchingRect);
+
+            DoAction(window, matchingRect);
+        }
+
+        private Stream FetchCapturedImage(string url)
+        {
+            using (var client = new HttpClient())
+            {
+                var response = client.GetAsync(url).Result;
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("Failed to fetch capture image");
+                }
+
+                var stream = response.Content.ReadAsStreamAsync().Result;
+
+                return stream;
+            }
+        }
+
+        private Bitmap GetImageToMatch(string url)
+        {
+            // Fetch original capture image from server
+            var stream = FetchCapturedImage(url);
             Bitmap originalCapture = Image.FromStream(stream) as Bitmap;
-            Bitmap matchingImage = new Bitmap(
+
+            // Create canvas to draw image
+            Bitmap imageToMatch = new Bitmap(
                 Math.Abs(EndPos[0] - StartPos[0]),
                 Math.Abs(EndPos[1] - StartPos[1])
             );
-            using (Graphics g = Graphics.FromImage(matchingImage))
+
+            // Extract area to match from fetched image
+            using (Graphics g = Graphics.FromImage(imageToMatch))
             {
                 g.DrawImage(originalCapture,
-                    new Rectangle(0, 0, matchingImage.Width, matchingImage.Height),
+                    new Rectangle(0, 0, imageToMatch.Width, imageToMatch.Height),
                     new Rectangle(Math.Min(StartPos[0], EndPos[0]), Math.Min(StartPos[1], EndPos[1]),
-                        matchingImage.Width, matchingImage.Height),
+                        imageToMatch.Width, imageToMatch.Height),
                     GraphicsUnit.Pixel);
             }
 
+            return imageToMatch;
+        }
+
+        private void FindWindowAndTryMatch(Bitmap imageToMatch, out WindowModel window, out Rectangle matchingRect)
+        {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            WindowModel window;
-            Rectangle matchingRect;
             while (true)
             {
-                Bitmap bmp;
                 try
                 {
                     // Capture target window
                     window = WindowModel.FindByTitle(WindowTitle);
-                    bmp = window.CaptureWindow();
                 }
                 catch (WindowNotFoundException)
                 {
@@ -101,10 +127,12 @@ namespace OpenRPA.Interpreter.Wml
                     continue;
                 }
 
+                Bitmap capture = window.CaptureWindow();
+
                 try
                 {
                     // Find matching area in target window
-                    matchingRect = FindMatchingRect(bmp, matchingImage);
+                    matchingRect = FindMatchingRect(capture, imageToMatch);
                 }
                 catch (ImageMatchingFailedException)
                 {
@@ -122,53 +150,6 @@ namespace OpenRPA.Interpreter.Wml
                 }
 
                 break;
-            }
-
-            var mouse = new MouseModel();
-
-            // Move cursor to matching area
-            var windowRect = window.GetRectangle();
-            mouse.Move(
-                windowRect.X + matchingRect.X + matchingRect.Width / 2,
-                windowRect.Y + matchingRect.Y + matchingRect.Height / 2
-            );
-
-            // Do action
-            switch (Action)
-            {
-                case "Nothing":
-                    break;
-
-                case "LeftClick":
-                    mouse.LeftClick();
-                    break;
-
-                case "RightClick":
-                    mouse.RightClick();
-                    break;
-
-                case "DoubleLeftClick":
-                    mouse.DoubleLeftClick();
-                    break;
-
-                default:
-                    throw new Exception($"Unknown action {Action}");
-            }
-        }
-
-        private Stream FetchCapturedImage(string url)
-        {
-            using (var client = new HttpClient())
-            {
-                var response = client.GetAsync(url).Result;
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception("Failed to fetch capture image");
-                }
-
-                var stream = response.Content.ReadAsStreamAsync().Result;
-
-                return stream;
             }
         }
 
@@ -214,6 +195,40 @@ namespace OpenRPA.Interpreter.Wml
                 }
 
                 return rect;
+            }
+        }
+
+        private void DoAction(WindowModel window, Rectangle matchingRect)
+        {
+            var mouse = new MouseModel();
+
+            // Move cursor to matching area
+            var windowRect = window.GetRectangle();
+            mouse.Move(
+                windowRect.X + matchingRect.X + matchingRect.Width / 2,
+                windowRect.Y + matchingRect.Y + matchingRect.Height / 2
+            );
+
+            // Do action
+            switch (Action)
+            {
+                case "Nothing":
+                    break;
+
+                case "LeftClick":
+                    mouse.LeftClick();
+                    break;
+
+                case "RightClick":
+                    mouse.RightClick();
+                    break;
+
+                case "DoubleLeftClick":
+                    mouse.DoubleLeftClick();
+                    break;
+
+                default:
+                    throw new Exception($"Unknown action {Action}");
             }
         }
     }
