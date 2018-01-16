@@ -46,7 +46,7 @@ namespace OpenRPA.Windows
             Win32.EnumWindows((IntPtr hWnd, IntPtr lParam) =>
             {
                 var w = new WindowModel(hWnd);
-                if (w.WindowTitle.Contains(title))
+                if (w.WindowTitle == title)
                 {
                     window = w;
 
