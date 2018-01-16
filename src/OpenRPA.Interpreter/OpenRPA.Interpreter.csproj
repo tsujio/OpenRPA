@@ -67,6 +67,7 @@
     <Compile Include="RobotFile.cs" />
     <Compile Include="Wml\EndNode.cs" />
     <Compile Include="Wml\ImageMatchingNode.cs" />
+    <Compile Include="Wml\FileReadNode.cs" />
     <Compile Include="Wml\KeyboardInputNode.cs" />
     <Compile Include="Wml\StartNode.cs" />
     <Compile Include="Wml\WaitNode.cs" />

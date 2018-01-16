@@ -1,0 +1,11 @@
+<script type="text/template" id="tmpl-file-read-node-property">
+  <div class="file-read-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <mdc-textfield v-model="nodeInstance.prop.path"
+                   class="path" label="File path to read" />
+  </div>
+</script>

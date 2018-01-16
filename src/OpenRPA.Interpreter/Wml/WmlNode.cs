@@ -36,6 +36,9 @@ namespace OpenRPA.Interpreter.Wml
                 case KeyboardInputNode.TYPE:
                     return new KeyboardInputNode(node);
 
+                case FileReadNode.TYPE:
+                    return new FileReadNode(node);
+
                 case WaitNode.TYPE:
                     return new WaitNode(node);
 

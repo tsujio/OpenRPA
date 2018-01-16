@@ -139,6 +139,7 @@ window.onload = function() {
         nodeClasses: [
           {type: 'ImageMatching', displayType: 'Image Matching'},
           {type: 'KeyboardInput', displayType: 'Keyboard Input'},
+          {type: 'FileRead', displayType: 'File Read'},
           {type: 'Wait', displayType: 'Wait'},
         ],
       };
@@ -210,6 +211,10 @@ window.onload = function() {
             nodeInstance.prop = this.getNewKeyboardInputNodeProperties();
             break;
 
+          case 'FileRead':
+            nodeInstance.prop = this.getNewFileReadNodeProperties();
+            break;
+
           case 'Wait':
             nodeInstance.prop = this.getNewWaitNodeProperties();
             break;
@@ -248,6 +253,12 @@ window.onload = function() {
       getNewKeyboardInputNodeProperties: function() {
         return {
           keys: "",
+        };
+      },
+
+      getNewFileReadNodeProperties: function() {
+        return {
+          path: "",
         };
       },
 
@@ -570,6 +581,12 @@ window.onload = function() {
 
   Vue.component('rpa-keyboard-input-node-property', {
     template: '#tmpl-keyboard-input-node-property',
+
+    props: ['nodeInstance'],
+  });
+
+  Vue.component('rpa-file-read-node-property', {
+    template: '#tmpl-file-read-node-property',
 
     props: ['nodeInstance'],
   });
