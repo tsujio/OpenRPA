@@ -4,6 +4,7 @@ The flask application package.
 
 from flask import Flask
 from flask_socketio import SocketIO
+from flask_sqlalchemy import SQLAlchemy
 from . import config
 
 
@@ -26,4 +27,8 @@ app.config.from_object(config.DevelopmentConfig)
 
 socketio = SocketIO(app, message_queue=app.config['REDIS_URL'])
 
+db = SQLAlchemy(app)
+
 import openrpaserver.views
+
+db.create_all()

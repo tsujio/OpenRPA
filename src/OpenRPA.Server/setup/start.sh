@@ -14,6 +14,9 @@ MYSQL_VERSION=5.7
 REDIS_NAME=openrpa-redis
 REDIS_VERSION=3.2
 
+# TODO: remove
+SQLITE_DATA=~/OpenRPA/openrpa.db
+
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ $DEBUG == '1' ]; then
@@ -83,6 +86,7 @@ docker run \
        --rm \
        -p $PORT:80 \
        -d \
+       -v $SQLITE_DATA:/var/lib/OpenRPA/openrpa.db \
        $extra_args \
        $OPENRPA_NAME \
        || exit 1

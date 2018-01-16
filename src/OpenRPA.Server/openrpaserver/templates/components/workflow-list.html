@@ -1,0 +1,11 @@
+<script type="text/template" id="tmpl-workflow-list">
+  <div class="workflow-list">
+    <mdc-drawer-list>
+      <mdc-drawer-item v-for="workflow in workflows" :key="workflow.id">
+        <span class="workflow-list-item" :data-id="workflow.id" @click="onItemClick">
+          {{ workflow.name }}
+        </span>
+      </mdc-drawer-item>
+    </mdc-drawer-list>
+  </div>
+</script>

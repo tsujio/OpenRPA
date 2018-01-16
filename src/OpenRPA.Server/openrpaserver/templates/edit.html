@@ -22,11 +22,7 @@
       </mdc-toolbar-row>
     </mdc-toolbar>
     <mdc-drawer slot="drawer" temporary="true" toggle-on="toggle-drawer">
-      <mdc-drawer-list>
-        <mdc-drawer-item start-icon="inbox">Inbox</mdc-drawer-item>
-        <mdc-drawer-item start-icon="send">Sent Mail</mdc-drawer-item>
-        <mdc-drawer-item start-icon="drafts">Drafts</mdc-drawer-item>
-      </mdc-drawer-list>
+      <rpa-workflow-list></rpa-workflow-list>
     </mdc-drawer>
     <main class="content">
       <rpa-node-palette></rpa-node-palette>
@@ -36,6 +32,7 @@
   </mdc-layout-app>
 </div>
 
+(% include 'components/workflow-list.html' %)
 (% include 'components/node-palette.html' %)
 (% include 'components/workflow-canvas.html' %)
 (% include 'components/node-property-panel.html' %)

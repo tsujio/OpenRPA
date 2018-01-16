@@ -15,30 +15,44 @@ import zipfile
 from flask import (request, render_template, session, send_file, url_for,
                    jsonify)
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from openrpaserver import app, socketio
+from openrpaserver import app, socketio, db
 
 SESSION_ID_LENGTH = 32
 
-SQLITE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                           'app.db')
 
-# Create db (TODO: use other rdb)
-if not os.path.exists(SQLITE_FILE):
-    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
-        c = conn.cursor()
-        c.execute("""
-        CREATE TABLE captures (
-            id CHAR(64),
-            data BLOB
-        );
-        """)
+class Workflow(db.Model):
+    id = db.Column(db.String(32), primary_key=True)
+    name = db.Column(db.String(256))
+    data = db.Column(db.Text())
+    created_at = db.Column(db.DateTime())
+    updated_at = db.Column(db.DateTime())
 
-        c.execute("""
-        CREATE TABLE workflows (
-            id CHAR(64),
-            workflow TEXT
-        );
-        """)
+    def __init__(self, id, name, data, created_at, updated_at):
+        self.id = id
+        self.name = name
+        self.data = data
+        self.created_at = created_at
+        self.updated_at = updated_at
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'data': json.loads(self.data),
+            'createdAt': "{:%Y-%m-%dT%H:%M:%SZ}".format(self.created_at),
+            'updatedAt': "{:%Y-%m-%dT%H:%M:%SZ}".format(self.updated_at),
+        }
+
+
+class Screenshot(db.Model):
+    id = db.Column(db.String(32), primary_key=True)
+    image = db.Column(db.BLOB())
+    created_at = db.Column(db.DateTime())
+
+    def __init__(self, id, image, created_at):
+        self.id = id
+        self.image = image
+        self.created_at = created_at
 
 
 @app.route('/')
@@ -66,97 +80,117 @@ def edit():
     )
 
 
-@app.route('/capture/<id>', methods=['GET'])
-def get_capture(id):
-    """Get uploaded window capture"""
-    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
-        c = conn.cursor()
-
-        c.execute("SELECT id, data FROM captures WHERE id = ?", (id,))
-
-        row = c.fetchone()
-
-    return send_file(io.BytesIO(row[1]), mimetype='image/png')
+@app.route('/screenshots/<id>', methods=['GET'])
+def get_screenshot(id):
+    """Get screenshot"""
+    screenshot = Screenshot.query.filter_by(id=id).first()
+    return send_file(io.BytesIO(screenshot.image), mimetype='image/png')
 
 
-@app.route('/capture', methods=['POST'])
-def upload_capture():
-    """Window capture upload handler."""
+@app.route('/screenshots', methods=['POST'])
+def upload_screenshot():
+    """Upload screenshot"""
     token = request.args['token']
-    capture = request.files['capture']
+    image = request.files['screenshot']
     title = request.form['title']
 
     if not re.match(r'^[\w-]+$', token):
         raise Exception("Invalid token format")
 
-    capture_id = binascii.hexlify(
-        os.urandom(SESSION_ID_LENGTH)
-    ).decode('utf-8')
-    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
-        c = conn.cursor()
+    screenshot = Screenshot(
+        id=str(uuid.uuid4()),
+        image=image.stream.read(),
+        created_at=datetime.utcnow(),
+    )
+    db.session.add(screenshot)
+    db.session.commit()
 
-        c.execute("INSERT INTO captures(id, data) VALUES (?, ?)",
-                  (capture_id, capture.stream.read()))
-
-        conn.commit()
-
-    print(app.config['REDIS_URL'])
     socket = SocketIO(message_queue=app.config['REDIS_URL'])
-    socket.emit('receive capture', {
-        'path': url_for('get_capture', id=capture_id),
+    socket.emit('receive screenshot', {
+        'path': url_for('get_screenshot', id=screenshot.id),
         'title': title,
-    }, room=token, namespace='/capture')
+    }, room=token, namespace='/screenshot')
 
     return 'OK', 200
 
 
-@socketio.on('connect', namespace='/capture')
-def listen_capture():
-    """Handle request for sending uploaded capture image"""
+@socketio.on('connect', namespace='/screenshot')
+def listen_screenshot():
+    """Handle request for sending uploaded screenshot"""
     join_room(session['session_id'])
-    emit('receiving capture ready')
+    emit('receiving screenshot ready')
 
     # TODO: leave_room at appropriate point
 
 
-@app.route('/workflow/save', methods=['POST'])
-def save_workflow():
-    """Save workflow"""
-    workflow = request.get_json()
-
-    id = binascii.hexlify(os.urandom(SESSION_ID_LENGTH)).decode('utf-8')
-    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
-        c = conn.cursor()
-
-        c.execute("INSERT INTO workflows(id, workflow) VALUES (?, ?)",
-                  (id, json.dumps(workflow)))
-
-        conn.commit()
-
-    return jsonify({'id': id})
-
-
 @app.route('/workflow/<id>', methods=['GET'])
-def get_workflow(id):
-    """Get workflow"""
-    with contextlib.closing(sqlite3.connect(SQLITE_FILE)) as conn:
-        c = conn.cursor()
-
-        c.execute("SELECT id, workflow FROM workflows WHERE id = ?", (id,))
-
-        row = c.fetchone()
+def get_robot_file(id):
+    """Get robot file"""
+    workflow = Workflow.query.filter_by(id=id).first()
 
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
         z.writestr('Robotfile', json.dumps({
             "version": "0.0.1",
-            "id": str(uuid.uuid4()),
-            "name": "sample1",
+            "id": workflow.id,
+            "name": workflow.name,
             "program": "workflow.xml"
         }, indent=4).encode('utf-8'))
 
-        z.writestr('workflow.xml', row[1].encode('utf-8'))
+        data = json.dumps(json.loads(workflow.data), indent=4)
+        z.writestr('workflow.xml', data.encode('utf-8'))
 
     buf.seek(0)
     return send_file(buf, attachment_filename='robot.zip',
                      mimetype='application/zip')
+
+
+@app.route('/workflows', methods=['GET'])
+def get_workflows():
+    """Get workflow list"""
+    workflows = Workflow.query.order_by(Workflow.name.asc()).all()
+    return jsonify([w.to_json() for w in workflows])
+
+
+@app.route('/workflows/<id>', methods=['GET'])
+def get_workflow(id):
+    """Get workflow"""
+    workflow = Workflow.query.filter_by(id=id).first()
+    return jsonify(workflow.to_json())
+
+
+@app.route('/workflows', methods=['POST'])
+def create_workflow():
+    """Create workflow"""
+    param = request.get_json()
+
+    workflow = Workflow(
+        id=str(uuid.uuid4()),
+        name=param.get('name', 'New Workflow'),
+        data=json.dumps(param.get('data', [])),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    db.session.add(workflow)
+    db.session.commit()
+
+    return jsonify({'id': workflow.id})
+
+
+@app.route('/workflows/<id>', methods=['PATCH'])
+def update_workflow(id):
+    """Update workflow"""
+    param = request.get_json()
+
+    # TODO: Exclusive lock
+    workflow = db.session.query(Workflow).filter_by(id=id).first()
+
+    if 'name' in param:
+        workflow.name = param['name']
+    if 'data' in param:
+        workflow.data = json.dumps(param['data'])
+
+    db.session.add(workflow)
+    db.session.commit()
+
+    return jsonify({'id': workflow.id})

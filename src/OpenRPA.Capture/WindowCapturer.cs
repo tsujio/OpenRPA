@@ -27,7 +27,7 @@ namespace OpenRPA.Capture
         {
             get
             {
-                return this.serverUrl + "/capture?token=" + this.uploadToken;
+                return this.serverUrl + "/screenshots?token=" + this.uploadToken;
             }
         }
 
@@ -92,7 +92,7 @@ namespace OpenRPA.Capture
                 using (var client = new HttpClient())
                 using (var formData = new MultipartFormDataContent())
                 {
-                    formData.Add(content, "capture", "capture.png");
+                    formData.Add(content, "screenshot", "screenshot.png");
                     formData.Add(new StringContent(w.WindowTitle), "title");
 
                     var response = client.PostAsync(this.CaptureUploadUrl, formData).Result;

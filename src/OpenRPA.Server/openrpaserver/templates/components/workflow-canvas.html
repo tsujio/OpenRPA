@@ -1,21 +1,23 @@
 <script type="text/template" id="tmpl-workflow-canvas">
   <div class="workflow-canvas">
-    <h1>Workflow Name</h1>
+    <mdc-textfield v-model="name" label="Title" box/>
 
-    <div class="canvas-controls">
-      <mdc-button raised @click="onSaveButtonClick">Save</mdc-button>
-      <mdc-button raised accent @click="onExecuteButtonClick">Execute</mdc-button>
-    </div>
+    <div class="canvas-main">
+      <div class="canvas-controls">
+        <mdc-button raised @click="onSaveButtonClick">Save</mdc-button>
+        <mdc-button raised accent @click="onExecuteButtonClick">Execute</mdc-button>
+      </div>
 
-    <div class="canvas">
-      <div class="flow">
-        <rpa-node-instance v-for="node in workflow"
-                           :id="node.id" :type="node.type"
-                           :display-type="node.displayType" :name="node.name"
-                           :prop="node.prop"
-                           :key="node.id"
-                           @successordrop="onSuccessorDrop"
-                           @nodepropertychange="onNodePropertyChange"></rpa-node-instance>
+      <div class="canvas">
+        <div class="flow">
+          <rpa-node-instance v-for="node in workflow"
+                             :id="node.id" :type="node.type"
+                             :display-type="node.displayType" :name="node.name"
+                             :prop="node.prop"
+                             :key="node.id"
+                             @successordrop="onSuccessorDrop"
+                             @nodepropertychange="onNodePropertyChange"></rpa-node-instance>
+        </div>
       </div>
     </div>
   </div>

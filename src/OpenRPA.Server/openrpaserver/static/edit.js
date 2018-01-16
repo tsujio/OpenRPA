@@ -151,6 +151,8 @@ window.onload = function() {
 
     data: function() {
       return {
+        id: "",
+        name: "New Workflow",
         workflow: [
           {id: uuid(), type: 'Start', displayType: 'Start', name: 'Start'},
           {id: uuid(), type: 'End', displayType: 'End', name: 'End'},
@@ -177,9 +179,19 @@ window.onload = function() {
       bus.$on('node-instance.click', function(nodeInstance) {
         bus.$emit('workflow-canvas.selectnode', nodeInstance.id);
       });
+
+      bus.$on('workflow-list.selectworkflow', function(workflow) {
+        self.loadWorkflow(workflow);
+      });
     },
 
     methods: {
+      loadWorkflow: function(workflow) {
+        this.id = workflow.id;
+        this.name = workflow.name;
+        this.workflow = workflow.data;
+      },
+
       findPositionById: function(id) {
         for (var i = 0; i < this.workflow.length; i++) {
           if (this.workflow[i].id === id) {
@@ -287,25 +299,51 @@ window.onload = function() {
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
             if (this.status === 200) {
-              callback(JSON.parse(this.response));
+              var resp = JSON.parse(this.response);
+
+              console.log("Saved: id=" + resp.id);
+
+              callback(resp);
             } else {
-              callback(null, new Error("Server returned status " + this.status));
+              console.log("Server returned status=" + this.status);
+
+              callback(null, new Error("Failed to save workflow"));
             }
           }
         };
 
         xhr.onerror = function(err) {
+          console.log(err);
+
           callback(null, err);
         };
 
-        xhr.open('POST', '/workflow/save');
+        if (this.id) {
+          // Update
+          xhr.open('PATCH', '/workflows/' + this.id);
+        } else {
+          // Create
+          xhr.open('POST', '/workflows');
+        }
+
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.responseType = 'application/json';
-        xhr.send(JSON.stringify(this.workflow));
+        xhr.send(JSON.stringify({
+          name: this.name,
+          data: this.workflow,
+        }));
       },
 
       onSaveButtonClick: function() {
-        this.saveWorkflow();
+        var self = this;
+
+        this.saveWorkflow(function(resp, err) {
+          if (!err) {
+            self.id = resp.id;
+
+            bus.$emit('workflow-canvas.updateworkflows');
+          }
+        });
       },
 
       onExecuteButtonClick: function() {
@@ -342,6 +380,10 @@ window.onload = function() {
       activate: function(nodeInstance) {
         this.nodeInstance = nodeInstance;
       },
+
+      inactivate: function() {
+        this.nodeInstance = null;
+      },
     },
   });
 
@@ -366,7 +408,7 @@ window.onload = function() {
     methods: {
       onCaptureButtonClick: function() {
         var self = this;
-        var socket = io.connect("/capture");
+        var socket = io.connect("/screenshot");
 
         // TODO: socket error handling
         socket.on('connect', function() {
@@ -375,7 +417,7 @@ window.onload = function() {
 
         var capturing = false;
 
-        socket.on('receiving capture ready', function() {
+        socket.on('receiving screenshot ready', function() {
           if (capturing) {
             return;
           }
@@ -393,10 +435,9 @@ window.onload = function() {
           capturing = true;
         });
 
-        socket.on('receive capture', function(data) {
+        socket.on('receive screenshot', function(data) {
           capturing = false;
 
-          console.log(data);
           self.nodeInstance.prop.imageUrlPath = data.path;
           self.nodeInstance.prop.windowTitle = data.title;
 
@@ -597,6 +638,83 @@ window.onload = function() {
     props: ['nodeInstance'],
   });
 
+  Vue.component('rpa-workflow-list', {
+    template: '#tmpl-workflow-list',
+
+    data: function() {
+      return {
+        workflows: [],
+      };
+    },
+
+    created: function() {
+      var self = this;
+
+      bus.$on('workflow-canvas.updateworkflows', function() {
+        self.reloadWorkflows();
+      });
+    },
+
+    mounted: function() {
+      this.reloadWorkflows();
+    },
+
+    methods: {
+      reloadWorkflows: function() {
+        var self = this;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (this.readyState === 4) {
+            if (this.status === 200) {
+              var workflows = JSON.parse(this.response);
+
+              self.workflows.splice(0, self.workflows.length);
+              self.workflows = self.workflows.concat(workflows);
+            } else {
+              console.log("Failed to fetch workflows: status=" + this.status);
+            }
+          }
+        };
+
+        xhr.onerror = function(err) {
+          coonsole.log("Failed to fetch workflows", err);
+        };
+
+        xhr.open('GET', '/workflows');
+        xhr.responseType = 'application/json';
+        xhr.send();
+      },
+
+      onItemClick: function(e) {
+        var id = e.target.getAttribute('data-id');
+
+        var self = this;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (this.readyState === 4) {
+            if (this.status === 200) {
+              var workflow = JSON.parse(this.response);
+
+              bus.$emit('workflow-list.selectworkflow', workflow);
+            } else {
+              console.log("Failed to fetch workflow: status=" + this.status);
+            }
+          }
+        };
+
+        xhr.onerror = function(err) {
+          coonsole.log("Failed to fetch workflow", err);
+        };
+
+        xhr.open('GET', '/workflows/' + id);
+        xhr.responseType = 'application/json';
+        xhr.send();
+      },
+    },
+  });
+
   new Vue({
     el: '#app',
 
@@ -604,6 +722,10 @@ window.onload = function() {
       var self = this;
       bus.$on('node-instance.select', function(nodeInstance) {
         self.activateNodePropertyPanel(nodeInstance);
+      });
+
+      bus.$on('workflow-list.selectworkflow', function(workflow) {
+        self.inactivateNodePropertyPanel();
       });
     },
 
@@ -615,6 +737,11 @@ window.onload = function() {
       activateNodePropertyPanel: function(nodeInstance) {
         this.isNodePropertyPanelActive = true;
         this.$refs.nodePropertyPanel.activate(nodeInstance);
+      },
+
+      inactivateNodePropertyPanel: function() {
+        this.isNodePropertyPanelActive = false;
+        this.$refs.nodePropertyPanel.inactivate();
       },
 
       onTitleClick: function() {
