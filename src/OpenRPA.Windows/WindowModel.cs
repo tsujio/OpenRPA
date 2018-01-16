@@ -59,10 +59,6 @@ namespace OpenRPA.Windows
             {
                 throw new Exception($"Window '{title}' not found");
             }
-            if (windows.Count > 1)
-            {
-                throw new Exception($"Window '{title}' found multiply");
-            }
 
             return windows.First();
         }
