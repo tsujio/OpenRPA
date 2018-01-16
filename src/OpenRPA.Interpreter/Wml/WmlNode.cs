@@ -36,6 +36,9 @@ namespace OpenRPA.Interpreter.Wml
                 case KeyboardInputNode.TYPE:
                     return new KeyboardInputNode(node);
 
+                case WaitNode.TYPE:
+                    return new WaitNode(node);
+
                 default:
                     throw new Exception($"Unknown node type: {type}");
             }

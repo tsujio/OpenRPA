@@ -2,5 +2,6 @@
   <div class="node-property-panel" :class="{ hidden: !active}">
     <rpa-image-matching-node-property v-if="nodeType === 'ImageMatching'" :node-instance="nodeInstance" />
     <rpa-keyboard-input-node-property v-if="nodeType === 'KeyboardInput'" :node-instance="nodeInstance" />
+    <rpa-wait-node-property v-if="nodeType === 'Wait'" :node-instance="nodeInstance" />
   </div>
 </script>

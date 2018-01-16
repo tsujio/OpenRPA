@@ -1,0 +1,11 @@
+<script type="text/template" id="tmpl-wait-node-property">
+  <div class="wait-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <mdc-textfield v-model="nodeInstance.prop.timeout"
+                   type="number" min="0" class="timeout" label="Number of seconds to wait" />
+  </div>
+</script>

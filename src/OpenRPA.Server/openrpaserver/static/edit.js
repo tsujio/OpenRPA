@@ -133,6 +133,7 @@ window.onload = function() {
         nodeClasses: [
           {type: 'ImageMatching', displayType: 'Image Matching'},
           {type: 'KeyboardInput', displayType: 'Keyboard Input'},
+          {type: 'Wait', displayType: 'Wait'},
         ],
       };
     },
@@ -187,6 +188,10 @@ window.onload = function() {
           case 'KeyboardInput':
             nodeInstance.prop = this.getNewKeyboardInputNodeProperties();
             break;
+
+          case 'Wait':
+            nodeInstance.prop = this.getNewWaitNodeProperties();
+            break;
           }
         }
 
@@ -221,6 +226,12 @@ window.onload = function() {
       getNewKeyboardInputNodeProperties: function() {
         return {
           keys: "",
+        };
+      },
+
+      getNewWaitNodeProperties: function() {
+        return {
+          timeout: 0,
         };
       },
 
@@ -501,6 +512,12 @@ window.onload = function() {
 
   Vue.component('rpa-keyboard-input-node-property', {
     template: '#tmpl-keyboard-input-node-property',
+
+    props: ['nodeInstance'],
+  });
+
+  Vue.component('rpa-wait-node-property', {
+    template: '#tmpl-wait-node-property',
 
     props: ['nodeInstance'],
   });

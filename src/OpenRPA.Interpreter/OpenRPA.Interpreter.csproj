@@ -69,6 +69,7 @@
     <Compile Include="Wml\ImageMatchingNode.cs" />
     <Compile Include="Wml\KeyboardInputNode.cs" />
     <Compile Include="Wml\StartNode.cs" />
+    <Compile Include="Wml\WaitNode.cs" />
     <Compile Include="Wml\WmlNode.cs" />
     <Compile Include="WorkflowInterpreter.cs" />
   </ItemGroup>
