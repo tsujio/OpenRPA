@@ -124,6 +124,7 @@ namespace OpenRPA.Capture
 
         public void Dispose()
         {
+            WindowModel.ClearRect();
             hotKey.Dispose();
             timer.Enabled = false;
         }

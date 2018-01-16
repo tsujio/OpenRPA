@@ -71,22 +71,19 @@ namespace OpenRPA.Windows
             IntPtr desktopPtr = Win32.GetDC(IntPtr.Zero);
 
             using (Graphics g = Graphics.FromHdc(desktopPtr))
-            using (var tp = new Pen(Color.Transparent, 0))
             using (var p = new Pen(Color.LimeGreen, 6))
             {
-                // Clear previous drawn rect
-                Win32.RECT r;
-                if (!Win32.GetWindowRect(Win32.GetDesktopWindow(), out r))
-                {
-                    throw new Exception("Failed to get window rect");
-                }
-                var screenRect = new Rectangle(r.left, r.top, r.right - r.left, r.bottom - r.top);
-                g.DrawRectangle(tp, screenRect);
+                ClearRect();
 
                 // Draw rect
                 g.DrawRectangle(p, new Rectangle(x, y, width, height));
             }
             Win32.ReleaseDC(IntPtr.Zero, desktopPtr);
+        }
+
+        public static void ClearRect()
+        {
+            Win32.InvalidateRect(IntPtr.Zero, IntPtr.Zero, false);
         }
 
         private WindowModel(IntPtr hWnd)
