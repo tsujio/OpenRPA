@@ -305,11 +305,9 @@ window.onload = function() {
             self.isSaving = false;
 
             if (this.status === 200) {
-              var resp = JSON.parse(this.response);
+              console.log("Saved: id=" + this.response.id);
 
-              console.log("Saved: id=" + resp.id);
-
-              callback(resp);
+              callback(this.response);
             } else {
               console.log("Server returned status=" + this.status);
 
@@ -335,7 +333,7 @@ window.onload = function() {
         }
 
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.responseType = 'application/json';
+        xhr.responseType = 'json';
         xhr.send(JSON.stringify({
           name: this.name,
           data: this.workflow,
@@ -687,7 +685,7 @@ window.onload = function() {
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
             if (this.status === 200) {
-              var workflows = JSON.parse(this.response);
+              var workflows = this.response;
 
               self.workflows.splice(0, self.workflows.length);
               self.workflows = self.workflows.concat(workflows);
@@ -702,7 +700,7 @@ window.onload = function() {
         };
 
         xhr.open('GET', '/workflows');
-        xhr.responseType = 'application/json';
+        xhr.responseType = 'json';
         xhr.send();
       },
 
@@ -715,7 +713,7 @@ window.onload = function() {
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
             if (this.status === 200) {
-              var workflow = JSON.parse(this.response);
+              var workflow = this.response;
 
               bus.$emit('workflow-list.selectworkflow', workflow);
             } else {
@@ -729,7 +727,7 @@ window.onload = function() {
         };
 
         xhr.open('GET', '/workflows/' + id);
-        xhr.responseType = 'application/json';
+        xhr.responseType = 'json';
         xhr.send();
       },
     },
