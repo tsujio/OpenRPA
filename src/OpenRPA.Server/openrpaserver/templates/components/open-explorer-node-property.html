@@ -1,0 +1,11 @@
+<script type="text/template" id="tmpl-open-explorer-node-property">
+  <div class="open-explorer-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <mdc-textfield v-model="nodeInstance.prop.path"
+                   class="path" label="Folder path to open" />
+  </div>
+</script>

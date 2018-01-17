@@ -2,6 +2,7 @@
   <div class="node-property-panel" :class="{ hidden: !active}">
     <rpa-image-matching-node-property v-if="nodeType === 'ImageMatching'" :node-instance="nodeInstance" />
     <rpa-keyboard-input-node-property v-if="nodeType === 'KeyboardInput'" :node-instance="nodeInstance" />
+        <rpa-open-explorer-node-property v-if="nodeType === 'OpenExplorer'" :node-instance="nodeInstance" />
     <rpa-wait-node-property v-if="nodeType === 'Wait'" :node-instance="nodeInstance" />
     <rpa-file-read-node-property v-if="nodeType === 'FileRead'" :node-instance="nodeInstance" />
   </div>

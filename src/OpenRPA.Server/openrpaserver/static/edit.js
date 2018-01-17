@@ -139,6 +139,7 @@ window.onload = function() {
         nodeClasses: [
           {type: 'ImageMatching', displayType: 'Image Matching'},
           {type: 'KeyboardInput', displayType: 'Keyboard Input'},
+          {type: 'OpenExplorer', displayType: 'Open Folder'},
           {type: 'FileRead', displayType: 'File Read'},
           {type: 'Wait', displayType: 'Wait'},
         ],
@@ -225,6 +226,10 @@ window.onload = function() {
             nodeInstance.prop = this.getNewKeyboardInputNodeProperties();
             break;
 
+          case 'OpenExplorer':
+            nodeInstance.prop = this.getNewOpenExplorerNodeProperties();
+            break;
+
           case 'FileRead':
             nodeInstance.prop = this.getNewFileReadNodeProperties();
             break;
@@ -268,6 +273,12 @@ window.onload = function() {
       getNewKeyboardInputNodeProperties: function() {
         return {
           keys: "",
+        };
+      },
+
+      getNewOpenExplorerNodeProperties: function() {
+        return {
+          path: "",
         };
       },
 
@@ -683,6 +694,12 @@ window.onload = function() {
 
   Vue.component('rpa-keyboard-input-node-property', {
     template: '#tmpl-keyboard-input-node-property',
+
+    props: ['nodeInstance'],
+  });
+
+  Vue.component('rpa-open-explorer-node-property', {
+    template: '#tmpl-open-explorer-node-property',
 
     props: ['nodeInstance'],
   });
