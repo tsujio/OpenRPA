@@ -383,11 +383,15 @@ window.onload = function() {
       },
 
       onExecuteButtonClick: function() {
+        var self = this;
+
         this.saveWorkflow(function(resp, err) {
           if (err) {
             alert(err);
             return;
           }
+
+          self.id = resp.id;
 
           location.href = 'openrpa:execute/' + resp.id;
         });
