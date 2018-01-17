@@ -18,7 +18,7 @@
 
     <div class="canvas-main">
       <div class="canvas-controls">
-        <mdc-button raised @click="onSaveButtonClick" :disabled="isSaving">
+        <mdc-button stroked @click="onSaveButtonClick" :disabled="isSaving">
           {{ isSaving ? 'Saving...' : 'Save' }}
         </mdc-button>
         <mdc-button raised accent @click="onExecuteButtonClick" :disabled="isSaving">
