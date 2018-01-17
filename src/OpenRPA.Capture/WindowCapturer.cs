@@ -73,6 +73,9 @@ namespace OpenRPA.Capture
 
         private void OnHotKeyPush(object sender, EventArgs e)
         {
+            timer.Enabled = false;
+            WindowModel.ClearRect();
+
             var mouse = new MouseModel();
             int x = mouse.Position.X;
             int y = mouse.Position.Y;
