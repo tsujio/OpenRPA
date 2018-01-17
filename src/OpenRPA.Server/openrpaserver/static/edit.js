@@ -391,7 +391,14 @@ window.onload = function() {
 
     methods: {
       activate: function(nodeInstance) {
-        this.nodeInstance = nodeInstance;
+        var self = this;
+
+        // For (maybe) bug of mdc-select, set null to nodeInstance
+        // before set actual instance.
+        this.nodeInstance = null;
+        setTimeout(function() {
+          self.nodeInstance = nodeInstance;
+        });
       },
 
       inactivate: function() {
