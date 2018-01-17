@@ -622,7 +622,7 @@ window.onload = function() {
         ctx.save();
 
         // Set point style
-        ctx.strokeStyle = ctx.fillStyle = "#00ff00";
+        ctx.strokeStyle = ctx.fillStyle = "#c6594b";
 
         // Draw point (small filled circle)
         ctx.beginPath();
