@@ -24,8 +24,6 @@ namespace OpenRPA.Client
             string serverUrl = this.Context.Parameters["serverUrl"];
             string assemblyPath = Context.Parameters["assemblypath"];
 
-            System.IO.File.WriteAllText(@"c:\users\tsujio\desktop\test.txt", assemblyPath);
-
             Configuration config = ConfigurationManager.OpenExeConfiguration(assemblyPath);
 
             config.AppSettings.Settings["serverUrl"].Value = serverUrl;
