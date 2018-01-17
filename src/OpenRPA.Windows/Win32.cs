@@ -9,6 +9,30 @@ namespace OpenRPA.Windows
 {
     internal class Win32
     {
+        internal static string GetLastErrorMessage()
+        {
+            const int BUFSIZE = 1024;
+
+            int errCode = Marshal.GetLastWin32Error();
+
+            var message = new StringBuilder(BUFSIZE);
+            FormatMessage(
+              FORMAT_MESSAGE_FROM_SYSTEM,
+              IntPtr.Zero,
+              (uint)errCode,
+              0,
+              message,
+              message.Capacity,
+              IntPtr.Zero);
+
+            return message.ToString();
+        }
+
+        internal const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
+
+        [DllImport("kernel32.dll")]
+        internal static extern uint FormatMessage(uint dwFlags, IntPtr lpSource, uint dwMessageId, uint dwLanguageId, StringBuilder lpBuffer, int nSize, IntPtr Arguments);
+
         [DllImport("kernel32.dll")]
         internal static extern IntPtr GetModuleHandle(string lpModuleName);
 
@@ -135,7 +159,7 @@ namespace OpenRPA.Windows
             internal int bottom;
         }
 
-        [DllImport("user32.dll")]
+        [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
 

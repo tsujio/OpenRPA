@@ -157,7 +157,7 @@ namespace OpenRPA.Windows
             Win32.RECT r;
             if (!Win32.GetWindowRect(this.hWnd, out r))
             {
-                throw new Exception("Failed to get window rect");
+                throw new Exception($"Failed to get window rect: {Win32.GetLastErrorMessage()}");
             }
             return new Rectangle(r.left, r.top, r.right - r.left, r.bottom - r.top);
         }

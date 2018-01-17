@@ -111,30 +111,13 @@ namespace OpenRPA.Interpreter.Wml
                 {
                     // Capture target window
                     window = WindowModel.FindByTitle(WindowTitle);
-                }
-                catch (WindowNotFoundException)
-                {
-                    stopwatch.Stop();
-                    if (stopwatch.Elapsed.TotalSeconds > Timeout)
-                    {
-                        throw;
-                    }
 
-                    Thread.Sleep(500);
+                    Bitmap capture = window.CaptureWindow();
 
-                    // Retry
-                    stopwatch.Start();
-                    continue;
-                }
-
-                Bitmap capture = window.CaptureWindow();
-
-                try
-                {
                     // Find matching area in target window
                     matchingRect = FindMatchingRect(capture, imageToMatch);
                 }
-                catch (ImageMatchingFailedException)
+                catch (Exception)
                 {
                     stopwatch.Stop();
                     if (stopwatch.Elapsed.TotalSeconds > Timeout)
