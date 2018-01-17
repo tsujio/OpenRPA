@@ -1,0 +1,17 @@
+<script type="text/template" id="tmpl-variable-node-property">
+  <div class="variable-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <p v-if="nodeInstance.prop.action === 'Read'">Data in variable will be stored to clipboard.</p>
+    <p v-if="nodeInstance.prop.action === 'Write'">Data in clipboard will be stored to variable.</p>
+
+    <mdc-radio v-model="nodeInstance.prop.action" name="action" value="Read">Read</mdc-radio>
+    <mdc-radio v-model="nodeInstance.prop.action" name="action" value="Write">Write</mdc-radio>
+
+    <mdc-textfield v-model="nodeInstance.prop.variableName"
+                   class="variable-name" label="Variable name to read-from/write-to" />
+  </div>
+</script>

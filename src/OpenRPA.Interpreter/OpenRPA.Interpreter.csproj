@@ -72,6 +72,7 @@
     <Compile Include="Wml\FileReadNode.cs" />
     <Compile Include="Wml\KeyboardInputNode.cs" />
     <Compile Include="Wml\StartNode.cs" />
+    <Compile Include="Wml\VariableNode.cs" />
     <Compile Include="Wml\WaitNode.cs" />
     <Compile Include="Wml\WmlNode.cs" />
     <Compile Include="WorkflowInterpreter.cs" />

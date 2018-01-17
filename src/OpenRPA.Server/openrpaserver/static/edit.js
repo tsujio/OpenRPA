@@ -142,6 +142,7 @@ window.onload = function() {
           {type: 'OpenExplorer', displayType: 'Open Folder'},
           {type: 'FileRead', displayType: 'File Read'},
           {type: 'UserInput', displayType: 'User Input'},
+          {type: 'Variable', displayType: 'Read/Write Variable'},
           {type: 'Wait', displayType: 'Wait'},
         ],
       };
@@ -239,6 +240,10 @@ window.onload = function() {
             nodeInstance.prop = this.getNewUserInputNodeProperties();
             break;
 
+          case 'Variable':
+            nodeInstance.prop = this.getNewVariableNodeProperties();
+            break;
+
           case 'Wait':
             nodeInstance.prop = this.getNewWaitNodeProperties();
             break;
@@ -297,6 +302,13 @@ window.onload = function() {
         return {
           variableName: "",
           promptText: "Please input xxxx",
+        };
+      },
+
+      getNewVariableNodeProperties: function() {
+        return {
+          action: "Read",
+          variableName: "",
         };
       },
 
@@ -773,6 +785,12 @@ window.onload = function() {
 
   Vue.component('rpa-user-input-node-property', {
     template: '#tmpl-user-input-node-property',
+
+    props: ['nodeInstance'],
+  });
+
+  Vue.component('rpa-variable-node-property', {
+    template: '#tmpl-variable-node-property',
 
     props: ['nodeInstance'],
   });

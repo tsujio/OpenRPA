@@ -5,6 +5,7 @@
     <rpa-open-explorer-node-property v-if="nodeType === 'OpenExplorer'" :node-instance="nodeInstance" />
     <rpa-file-read-node-property v-if="nodeType === 'FileRead'" :node-instance="nodeInstance" />
     <rpa-user-input-node-property v-if="nodeType === 'UserInput'" :node-instance="nodeInstance" />
+    <rpa-variable-node-property v-if="nodeType === 'Variable'" :node-instance="nodeInstance" />
     <rpa-wait-node-property v-if="nodeType === 'Wait'" :node-instance="nodeInstance" />
   </div>
 </script>

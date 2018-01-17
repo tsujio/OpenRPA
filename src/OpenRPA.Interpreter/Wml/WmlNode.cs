@@ -45,6 +45,9 @@ namespace OpenRPA.Interpreter.Wml
                 case UserInputNode.TYPE:
                     return new UserInputNode(node);
 
+                case VariableNode.TYPE:
+                    return new VariableNode(node);
+
                 case WaitNode.TYPE:
                     return new WaitNode(node);
 
