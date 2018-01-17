@@ -257,8 +257,8 @@ window.onload = function() {
           startPos: [0, 0],
           endPos: [0, 0],
           windowTitle: "",
-          action: "",
-          timeout: 0,
+          action: "Nothing",
+          timeout: 10,
         };
       },
 
