@@ -34,6 +34,15 @@ namespace OpenRPA.Interpreter.Wml
             switch (Action)
             {
                 case "Read":
+                    // Temporary use as a method for retrieving time
+                    var now = DateTime.Now;
+                    context.Variables["__YEAR__"] = now.Year.ToString();
+                    context.Variables["__MONTH__"] = now.Month.ToString();
+                    context.Variables["__DAY__"] = now.Day.ToString();
+                    context.Variables["__HOUR__"] = now.Hour.ToString();
+                    context.Variables["__MINUTE__"] = now.Minute.ToString();
+                    context.Variables["__SECOND__"] = now.Second.ToString();
+
                     if (!context.Variables.ContainsKey(VariableName))
                     {
                         throw new ArgumentException($"Variable '{VariableName}' not found");
