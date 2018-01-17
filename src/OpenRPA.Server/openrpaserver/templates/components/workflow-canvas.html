@@ -4,8 +4,12 @@
 
     <div class="canvas-main">
       <div class="canvas-controls">
-        <mdc-button raised @click="onSaveButtonClick">Save</mdc-button>
-        <mdc-button raised accent @click="onExecuteButtonClick">Execute</mdc-button>
+        <mdc-button raised @click="onSaveButtonClick" :disabled="isSaving">
+          {{ isSaving ? 'Saving...' : 'Save' }}
+        </mdc-button>
+        <mdc-button raised accent @click="onExecuteButtonClick" :disabled="isSaving">
+          Execute
+        </mdc-button>
       </div>
 
       <div class="canvas">

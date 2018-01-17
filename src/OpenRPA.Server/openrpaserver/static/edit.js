@@ -157,6 +157,8 @@ window.onload = function() {
           {id: uuid(), type: 'Start', displayType: 'Start', name: 'Start'},
           {id: uuid(), type: 'End', displayType: 'End', name: 'End'},
         ],
+
+        isSaving: false,
       };
     },
 
@@ -295,9 +297,13 @@ window.onload = function() {
       saveWorkflow: function(callback) {
         callback = callback || function() {};
 
+        var self = this;
+
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
+            self.isSaving = false;
+
             if (this.status === 200) {
               var resp = JSON.parse(this.response);
 
@@ -314,6 +320,8 @@ window.onload = function() {
 
         xhr.onerror = function(err) {
           console.log(err);
+
+          self.isSaving = false;
 
           callback(null, err);
         };
@@ -332,17 +340,22 @@ window.onload = function() {
           name: this.name,
           data: this.workflow,
         }));
+
+        this.isSaving = true;
       },
 
       onSaveButtonClick: function() {
         var self = this;
 
         this.saveWorkflow(function(resp, err) {
-          if (!err) {
-            self.id = resp.id;
-
-            bus.$emit('workflow-canvas.updateworkflows');
+          if (err) {
+            alert(err);
+            return;
           }
+
+          self.id = resp.id;
+
+          bus.$emit('workflow-canvas.updateworkflows');
         });
       },
 
