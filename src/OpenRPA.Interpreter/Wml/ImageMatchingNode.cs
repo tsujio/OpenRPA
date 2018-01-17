@@ -35,6 +35,8 @@ namespace OpenRPA.Interpreter.Wml
 
         internal string Action { get; private set; }
 
+        internal IList<int> ActionPos { get; private set; }
+
         internal int Timeout { get; private set; }
 
         internal ImageMatchingNode(dynamic node) : base(node as JToken)
@@ -46,6 +48,7 @@ namespace OpenRPA.Interpreter.Wml
             EndPos = (prop.endPos as JArray).ToObject<IList<int>>();
             WindowTitle = prop.windowTitle;
             Action = prop.action;
+            ActionPos = (prop.actionPos as JArray).ToObject<IList<int>>();
             Timeout = prop.timeout;
         }
 
@@ -188,8 +191,8 @@ namespace OpenRPA.Interpreter.Wml
             // Move cursor to matching area
             var windowRect = window.GetRectangle();
             mouse.Move(
-                windowRect.X + matchingRect.X + matchingRect.Width / 2,
-                windowRect.Y + matchingRect.Y + matchingRect.Height / 2
+                windowRect.X + matchingRect.X + ActionPos[0],
+                windowRect.Y + matchingRect.Y + ActionPos[1]
             );
 
             // Do action

@@ -260,6 +260,7 @@ window.onload = function() {
           endPos: [0, 0],
           windowTitle: "",
           action: "Nothing",
+          actionPos: [0, 0],
           timeout: 10,
         };
       },
@@ -305,9 +306,11 @@ window.onload = function() {
             self.isSaving = false;
 
             if (this.status === 200) {
-              console.log("Saved: id=" + this.response.id);
+              var workflow = JSON.parse(this.response);
 
-              callback(this.response);
+              console.log("Saved: id=" + workflow.id);
+
+              callback(workflow);
             } else {
               console.log("Server returned status=" + this.status);
 
@@ -333,7 +336,6 @@ window.onload = function() {
         }
 
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.responseType = 'json';
         xhr.send(JSON.stringify({
           name: this.name,
           data: this.workflow,
@@ -481,6 +483,7 @@ window.onload = function() {
         imageUrlPath: "",
         startPos: null,
         endPos: null,
+        actionPos: null,
       };
     },
 
@@ -490,6 +493,7 @@ window.onload = function() {
         this.imageUrlPath = prop.imageUrlPath;
         this.startPos = prop.startPos;
         this.endPos = prop.endPos;
+        this.actionPos = prop.actionPos;
 
         // Use setTimeout for propagating data change
         var self = this;
@@ -502,6 +506,7 @@ window.onload = function() {
       onSave: function() {
         this.nodeInstance.prop.startPos = this.startPos;
         this.nodeInstance.prop.endPos = this.endPos;
+        this.nodeInstance.prop.actionPos = this.actionPos;
       },
 
       onCancel: function() {
@@ -512,15 +517,28 @@ window.onload = function() {
   Vue.component('rpa-image-matching-capture-image-dialog-canvas', {
     template: '#tmpl-image-matching-capture-image-dialog-canvas',
 
-    props: ['imageUrlPath', 'startPos', 'endPos'],
+    props: ['imageUrlPath', 'startPos', 'endPos', 'actionPos'],
 
     data: function() {
       return {
         isMouseDown: false,
+        isMovingActionPos: false,
+        actionPosRadius: 5,
       };
     },
 
     methods: {
+      getTopLeftPosOfRect: function() {
+        return [Math.min(this.startPos[0], this.endPos[0]),
+                Math.min(this.startPos[1], this.endPos[1])];
+      },
+
+      getAbsoluteActionPos: function() {
+        var topLeftPos = this.getTopLeftPosOfRect();
+        return [topLeftPos[0] + this.actionPos[0],
+                topLeftPos[1] + this.actionPos[1]];
+      },
+
       initialize: function() {
         this.isMouseDown = false;
         this.draw();
@@ -595,18 +613,11 @@ window.onload = function() {
         // Set point style
         ctx.strokeStyle = ctx.fillStyle = "#00ff00";
 
-        ctx.beginPath();
-
         // Draw point (small filled circle)
-        ctx.arc(
-          (startPos[0] + endPos[0]) / 2,
-          (startPos[1] + endPos[1]) / 2,
-          5,
-          0,
-          2 * Math.PI
-        );
+        ctx.beginPath();
+        var absPos = this.getAbsoluteActionPos();
+        ctx.arc(absPos[0], absPos[1], this.actionPosRadius, 0, 2 * Math.PI);
         ctx.fill();
-
         ctx.stroke();
 
         ctx.restore();
@@ -616,8 +627,21 @@ window.onload = function() {
         this.isMouseDown = true;
 
         var rect = e.target.getBoundingClientRect();
-        this.startPos[0] = e.clientX - rect.left;
-        this.startPos[1] = e.clientY - rect.top;
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+
+        // If cursor is on actionPos...
+        var absPos = this.getAbsoluteActionPos();
+        if (Math.pow(x - absPos[0], 2) + Math.pow(y - absPos[1], 2) <=
+            Math.pow(this.actionPosRadius, 2)) {
+          // Start moving actionPos
+          this.isMovingActionPos = true;
+
+          return;
+        }
+
+        this.startPos[0] = x;
+        this.startPos[1] = y;
       },
 
       onMouseMove: function(e) {
@@ -626,14 +650,33 @@ window.onload = function() {
         }
 
         var rect = e.target.getBoundingClientRect();
-        this.endPos[0] = e.clientX - rect.left;
-        this.endPos[1] = e.clientY - rect.top;
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+
+        var topLeftPos = this.getTopLeftPosOfRect();
+
+        if (this.isMovingActionPos) {
+          // Set actionPos to cursor position
+          this.actionPos[0] = x - topLeftPos[0];
+          this.actionPos[1] = y - topLeftPos[1];
+        } else {
+          // Set endPos to cursor position
+          this.endPos[0] = x;
+          this.endPos[1] = y;
+
+          // Set actionPos to center of rect
+          this.actionPos[0] =
+            (this.startPos[0] + this.endPos[0]) / 2 - topLeftPos[0];
+          this.actionPos[1] =
+            (this.startPos[1] + this.endPos[1]) / 2 - topLeftPos[1];
+        }
 
         this.draw();
       },
 
       onMouseUp: function() {
         this.isMouseDown = false;
+        this.isMovingActionPos = false;
       },
     },
   });
@@ -685,7 +728,7 @@ window.onload = function() {
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
             if (this.status === 200) {
-              var workflows = this.response;
+              var workflows = JSON.parse(this.response);
 
               self.workflows.splice(0, self.workflows.length);
               self.workflows = self.workflows.concat(workflows);
@@ -700,7 +743,6 @@ window.onload = function() {
         };
 
         xhr.open('GET', '/workflows');
-        xhr.responseType = 'json';
         xhr.send();
       },
 
@@ -713,7 +755,7 @@ window.onload = function() {
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
             if (this.status === 200) {
-              var workflow = this.response;
+              var workflow = JSON.parse(this.response);
 
               bus.$emit('workflow-list.selectworkflow', workflow);
             } else {
@@ -727,7 +769,6 @@ window.onload = function() {
         };
 
         xhr.open('GET', '/workflows/' + id);
-        xhr.responseType = 'json';
         xhr.send();
       },
     },
