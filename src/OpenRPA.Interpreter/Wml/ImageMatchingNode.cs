@@ -54,6 +54,11 @@ namespace OpenRPA.Interpreter.Wml
 
         internal override void Evaluate(Context context)
         {
+            if (StartPos[0] == EndPos[0] && StartPos[1] == EndPos[1])
+            {
+                throw new Exception("Rectangle to match not specified");
+            }
+
             var url = context.Helper.GetFullUrl(ImageUrlPath);
             Bitmap imageToMatch = GetImageToMatch(url);
 
