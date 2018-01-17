@@ -1,5 +1,19 @@
 <script type="text/template" id="tmpl-workflow-canvas">
   <div class="workflow-canvas">
+    <div class="workflow-menu">
+      <mdc-menu-anchor>
+        <mdc-button stroked @click="onMenuClick"><mdc-icon icon="settings"></mdc-icon></mdc-button>
+        <mdc-menu ref="menu" open-from-top-right @select="onMenuItemSelect">
+          <mdc-menu-item data-menu-item-id="delete">Delete</mdc-menu-item>
+        </mdc-menu>
+      </mdc-menu-anchor>
+
+      <mdc-dialog ref="dialog" title="Confirmation" accept="Delete" cancel="Cancel"
+                  @accept="onDeleteWorkflowConfirmationAccept">
+        Delete this workflow?
+      </mdc-dialog>
+    </div>
+
     <mdc-textfield v-model="name" label="Title" box/>
 
     <div class="canvas-main">

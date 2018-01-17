@@ -89,6 +89,14 @@
     margin-right: 300px;
     padding: 0 20px;
     overflow-x: scroll;
+    position: relative;
+}
+
+.workflow-canvas .workflow-menu {
+    position: absolute;
+    right: 0;
+    margin-right: 30px;
+    margin-top: 30px;
 }
 
 .workflow-canvas .canvas-main {

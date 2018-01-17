@@ -194,3 +194,14 @@ def update_workflow(id):
     db.session.commit()
 
     return jsonify({'id': workflow.id})
+
+
+@app.route('/workflows/<id>', methods=['DELETE'])
+def delete_workflow(id):
+    """Delete workflow"""
+    workflow = db.session.query(Workflow).filter_by(id=id).first()
+
+    db.session.delete(workflow)
+    db.session.commit()
+
+    return jsonify()

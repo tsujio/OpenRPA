@@ -380,6 +380,51 @@ window.onload = function() {
           location.href = 'openrpa:execute/' + resp.id;
         });
       },
+
+      onMenuClick: function() {
+        this.$refs.menu.show();
+      },
+
+      onMenuItemSelect: function(selected) {
+        var id = selected.item.getAttribute('data-menu-item-id');
+
+        switch (id) {
+        case 'delete':
+          this.$refs.dialog.show();
+          break;
+        }
+      },
+
+      onDeleteWorkflowConfirmationAccept: function() {
+        if (!this.id) {
+          return;
+        }
+
+        var self = this;
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (this.readyState === 4) {
+            if (this.status === 200) {
+              self.id = "";
+              self.name = "";
+              self.workflow.splice(0, self.workflow.length);
+
+              bus.$emit('workflow-canvas.updateworkflows');
+              bus.$emit('workflow-canvas.deleteworkflow');
+            } else {
+              console.log("Failed to delete workflow: status=" + this.status);
+            }
+          }
+        };
+
+        xhr.onerror = function(err) {
+          coonsole.log("Failed to delete workflow", err);
+        };
+
+        xhr.open('DELETE', '/workflows/' + this.id);
+        xhr.send();
+      },
     },
   });
 
@@ -801,6 +846,9 @@ window.onload = function() {
       });
 
       bus.$on('workflow-list.selectworkflow', function(workflow) {
+        self.inactivateNodePropertyPanel();
+      });
+      bus.$on('workflow-list.deleteworkflow', function(workflow) {
         self.inactivateNodePropertyPanel();
       });
     },
