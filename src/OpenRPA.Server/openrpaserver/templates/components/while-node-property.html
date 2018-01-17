@@ -1,0 +1,16 @@
+<script type="text/template" id="tmpl-while-node-property">
+  <div class="while-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <p v-if="nodeInstance.prop.inverseCondition">Loop while data in clipboard do not equal to variable.</p>
+    <p v-if="!nodeInstance.prop.inverseCondition">Loop while data in clipboard equal to variable.</p>
+
+    <mdc-checkbox label="Inverse condition" v-model="nodeInstance.prop.inverseCondition"/>
+
+    <mdc-textfield v-model="nodeInstance.prop.variableName"
+                   class="variable-name" label="Variable name to compare to" />
+  </div>
+</script>

@@ -57,6 +57,7 @@
     <Content Include="openrpaserver\templates\components\node-property-panel.html" />
     <Content Include="openrpaserver\templates\components\open-explorer-node-property.html" />
     <Content Include="openrpaserver\templates\components\variable-node-property.html" />
+    <Content Include="openrpaserver\templates\components\while-node-property.html" />
     <Content Include="openrpaserver\templates\components\wait-node-property.html" />
     <Content Include="openrpaserver\templates\components\workflow-canvas.html" />
     <Content Include="openrpaserver\templates\components\workflow-list.html" />

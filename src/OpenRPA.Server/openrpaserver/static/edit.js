@@ -144,6 +144,8 @@ window.onload = function() {
           {type: 'UserInput', displayType: 'User Input'},
           {type: 'Variable', displayType: 'Read/Write Variable'},
           {type: 'Wait', displayType: 'Wait'},
+          {type: 'While', displayType: 'Loop'},
+          {type: 'WhileEnd', displayType: 'Loop End'}, // TODO
         ],
       };
     },
@@ -247,6 +249,10 @@ window.onload = function() {
           case 'Wait':
             nodeInstance.prop = this.getNewWaitNodeProperties();
             break;
+
+          case 'While':
+            nodeInstance.prop = this.getNewWhileNodeProperties();
+            break;
           }
         }
 
@@ -315,6 +321,13 @@ window.onload = function() {
       getNewWaitNodeProperties: function() {
         return {
           timeout: 0,
+        };
+      },
+
+      getNewWhileNodeProperties: function() {
+        return {
+          inverseCondition: false,
+          variableName: "",
         };
       },
 
@@ -797,6 +810,12 @@ window.onload = function() {
 
   Vue.component('rpa-wait-node-property', {
     template: '#tmpl-wait-node-property',
+
+    props: ['nodeInstance'],
+  });
+
+  Vue.component('rpa-while-node-property', {
+    template: '#tmpl-while-node-property',
 
     props: ['nodeInstance'],
   });

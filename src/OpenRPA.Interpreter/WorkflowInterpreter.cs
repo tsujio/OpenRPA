@@ -32,8 +32,33 @@ namespace OpenRPA.Interpreter
                 workflow = JArray.Parse(r.ReadToEnd());
             }
 
+            var flowInLoop = new List<WmlNode>();
             foreach (var node in workflow.Select(jToken => WmlNode.Parse(jToken)))
             {
+                // Temprary loop implementation
+                if (node.Type == WhileNode.TYPE || flowInLoop.Count > 0)
+                {
+                    flowInLoop.Add(node);
+
+                    if (node.Type != WhileEndNode.TYPE)
+                    {
+                        continue;
+                    }
+
+                    var whileNode = flowInLoop.First() as WhileNode;
+                    flowInLoop.RemoveAt(0);
+
+                    while (whileNode.EvaluateCondition(context))
+                    {
+                        foreach (var n in flowInLoop)
+                        {
+                            n.Evaluate(context);
+                        }
+                    }
+
+                    flowInLoop.Clear();
+                }
+
                 node.Evaluate(context);
             }
         }

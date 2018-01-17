@@ -51,6 +51,12 @@ namespace OpenRPA.Interpreter.Wml
                 case WaitNode.TYPE:
                     return new WaitNode(node);
 
+                case WhileNode.TYPE:
+                    return new WhileNode(node);
+
+                case WhileEndNode.TYPE:
+                    return new WhileEndNode(node);
+
                 default:
                     throw new Exception($"Unknown node type: {type}");
             }
