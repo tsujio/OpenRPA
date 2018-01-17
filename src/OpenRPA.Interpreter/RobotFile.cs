@@ -39,10 +39,7 @@ namespace OpenRPA.Interpreter
         {
             var path = Path.Combine(destinationDir, robotId + ".rpa");
 
-            if (!File.Exists(path))
-            {
-                Fetch(serverUrl, robotId, path);
-            }
+            Fetch(serverUrl, robotId, path);
 
             string dest = DecompressFile(path);
 
