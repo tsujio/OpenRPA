@@ -42,6 +42,9 @@ namespace OpenRPA.Interpreter.Wml
                 case FileReadNode.TYPE:
                     return new FileReadNode(node);
 
+                case UserInputNode.TYPE:
+                    return new UserInputNode(node);
+
                 case WaitNode.TYPE:
                     return new WaitNode(node);
 

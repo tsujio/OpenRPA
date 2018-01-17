@@ -66,6 +66,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RobotFile.cs" />
     <Compile Include="Wml\EndNode.cs" />
+    <Compile Include="Wml\UserInputNode.cs" />
     <Compile Include="Wml\OpenExplorerNode.cs" />
     <Compile Include="Wml\ImageMatchingNode.cs" />
     <Compile Include="Wml\FileReadNode.cs" />

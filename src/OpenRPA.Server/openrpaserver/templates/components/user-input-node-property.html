@@ -1,0 +1,14 @@
+<script type="text/template" id="tmpl-user-input-node-property">
+  <div class="user-input-node-property">
+    <span class="node-type">{{ nodeInstance.displayType }}</span>
+
+    <mdc-textfield v-model="nodeInstance.name"
+                   class="node-name" label="Action name" />
+
+    <mdc-textfield v-model="nodeInstance.prop.variableName"
+                   class="variable-name" label="Variable name to store input" />
+
+    <mdc-textfield v-model="nodeInstance.prop.promptText"
+                   class="prompt-text" label="Text to prompt user to input" />
+  </div>
+</script>

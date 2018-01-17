@@ -15,9 +15,12 @@ namespace OpenRPA.Interpreter
 
         internal HelperClass Helper { get; }
 
+        internal IDictionary<String, String> Variables { get; private set; }
+
         internal Context()
         {
             Helper = new HelperClass();
+            Variables = new Dictionary<String, String>();
         }
     }
 }

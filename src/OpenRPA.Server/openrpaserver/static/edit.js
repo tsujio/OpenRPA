@@ -141,6 +141,7 @@ window.onload = function() {
           {type: 'KeyboardInput', displayType: 'Keyboard Input'},
           {type: 'OpenExplorer', displayType: 'Open Folder'},
           {type: 'FileRead', displayType: 'File Read'},
+          {type: 'UserInput', displayType: 'User Input'},
           {type: 'Wait', displayType: 'Wait'},
         ],
       };
@@ -234,6 +235,10 @@ window.onload = function() {
             nodeInstance.prop = this.getNewFileReadNodeProperties();
             break;
 
+          case 'UserInput':
+            nodeInstance.prop = this.getNewUserInputNodeProperties();
+            break;
+
           case 'Wait':
             nodeInstance.prop = this.getNewWaitNodeProperties();
             break;
@@ -285,6 +290,13 @@ window.onload = function() {
       getNewFileReadNodeProperties: function() {
         return {
           path: "",
+        };
+      },
+
+      getNewUserInputNodeProperties: function() {
+        return {
+          variableName: "",
+          promptText: "Please input xxxx",
         };
       },
 
@@ -751,6 +763,12 @@ window.onload = function() {
 
   Vue.component('rpa-file-read-node-property', {
     template: '#tmpl-file-read-node-property',
+
+    props: ['nodeInstance'],
+  });
+
+  Vue.component('rpa-user-input-node-property', {
+    template: '#tmpl-user-input-node-property',
 
     props: ['nodeInstance'],
   });

@@ -45,6 +45,7 @@
     <Content Include="Dockerfile" />
     <Content Include="openrpaserver\static\edit.css" />
     <Content Include="openrpaserver\static\edit.js" />
+    <Content Include="openrpaserver\templates\components\user-input-node-property.html" />
     <Content Include="openrpaserver\templates\components\file-read-node-property.html" />
     <Content Include="openrpaserver\templates\components\image-matching-capture-image-dialog-canvas.html" />
     <Content Include="openrpaserver\templates\components\image-matching-capture-image-dialog.html" />
