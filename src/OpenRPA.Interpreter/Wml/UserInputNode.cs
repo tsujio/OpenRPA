@@ -42,6 +42,7 @@ namespace OpenRPA.Interpreter.Wml
             {
                 Left = 50,
                 Top = 40,
+                Width = 200,
                 Text = PromptText,
             });
 
