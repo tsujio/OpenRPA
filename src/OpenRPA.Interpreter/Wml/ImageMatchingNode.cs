@@ -191,36 +191,42 @@ namespace OpenRPA.Interpreter.Wml
 
         private void DoAction(WindowModel window, Rectangle matchingRect)
         {
-            var mouse = new MouseModel();
-
-            // Move cursor to matching area
-            var windowRect = window.GetRectangle();
-            mouse.Move(
-                windowRect.X + matchingRect.X + ActionPos[0],
-                windowRect.Y + matchingRect.Y + ActionPos[1]
-            );
-
-            // Do action
+            MouseModel.MouseActionType action;
             switch (Action)
             {
                 case "Nothing":
+                    action = MouseModel.MouseActionType.None;
                     break;
 
                 case "LeftClick":
-                    mouse.LeftClick();
+                    action = MouseModel.MouseActionType.LeftClick;
                     break;
 
                 case "RightClick":
-                    mouse.RightClick();
+                    action = MouseModel.MouseActionType.RightClick;
                     break;
 
                 case "DoubleLeftClick":
-                    mouse.DoubleLeftClick();
+                    action = MouseModel.MouseActionType.DoubleLeftClick;
+                    break;
+
+                case "Drag":
+                    action = MouseModel.MouseActionType.Drag;
                     break;
 
                 default:
                     throw new Exception($"Unknown action {Action}");
             }
+
+            var mouse = new MouseModel();
+
+            // Move cursor to matching area and do action
+            var windowRect = window.GetRectangle();
+            mouse.Move(
+                windowRect.X + matchingRect.X + ActionPos[0],
+                windowRect.Y + matchingRect.Y + ActionPos[1],
+                action
+            );
         }
     }
 }

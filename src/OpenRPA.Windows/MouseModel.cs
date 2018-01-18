@@ -15,6 +15,7 @@ namespace OpenRPA.Windows
             LeftClick,
             RightClick,
             DoubleLeftClick,
+            Drag,
         }
 
         public class PositionClass
@@ -34,6 +35,11 @@ namespace OpenRPA.Windows
 
         public void Move(int x, int y, MouseActionType action = MouseActionType.None)
         {
+            if (action == MouseActionType.Drag)
+            {
+                StartDrag();
+            }
+
             Win32.SetCursorPos(x, y);
 
             switch (action)
@@ -48,6 +54,10 @@ namespace OpenRPA.Windows
 
                 case MouseActionType.DoubleLeftClick:
                     DoubleLeftClick();
+                    break;
+
+                case MouseActionType.Drag:
+                    StopDrag();
                     break;
             }
         }
@@ -68,6 +78,16 @@ namespace OpenRPA.Windows
         {
             LeftClick();
             LeftClick();
+        }
+
+        private void StartDrag()
+        {
+            Win32.mouse_event(Win32.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+        }
+
+        private void StopDrag()
+        {
+            Win32.mouse_event(Win32.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
     }
 }
