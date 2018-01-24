@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenRPA</title>
+    <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
+    <style>
+     body {
+       margin: 0;
+     }
+
+     .container {
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+       height: 80vh;
+     }
+
+     .main {
+       text-align: center;
+       font-size: 2rem;
+     }
+
+     .main a {
+       margin-left: 2rem;
+     }
+
+     footer {
+       text-align: center;
+       margin-top: 8rem;
+     }
+    </style>
+  </head>
+  <body class="mdc-typography">
+    <header class="mdc-toolbar">
+      <div class="mdc-toolbar__row">
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="main">
+        <h1>OpenRPA</h1>
+
+        <p>A free open source <strong>Robotic Process Automation</strong> software.</p>
+
+        <a href="#"
+           class="mdc-button mdc-button--raised">Try now</a>
+        <a href="https://tsujio.github.io/OpenRPA/spec/index.html"
+           class="mdc-button mdc-button--raised mdc-theme--secondary-bg">for Developers</a>
+      </div>
+
+      <footer>
+        <p>&copy; <span class="year"></span> - OpenRPA</p>
+
+        <p>Developed by Naoki Tsujio on <a href="https://github.com/tsujio/OpenRPA">GitHub</a></p>
+      </footer>
+    </div>
+
+    <script>
+     document.querySelector('.year').innerText = (new Date()).getYear() + 1900
+    </script>
+  </body>
+</html>
