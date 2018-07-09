@@ -4,10 +4,13 @@ Routes and views for the flask application.
 
 import binascii
 from datetime import datetime
+import io
+import json
 import os
 import pickle
 import re
-from flask import request, render_template, session
+import zipfile
+from flask import request, render_template, session, send_file
 from flask_socketio import emit
 from openrpaserver import app, socketio, redis
 
@@ -93,3 +96,31 @@ def listen_capture():
             emit('receive capture', pickle.loads(item['data']))
             pubsub.unsubscribe()
             break
+
+
+@app.route('/download', methods=['POST'])
+def download():
+    capture = request.files['capture']
+    rect = json.loads(request.form['rect'])
+    title = request.form['title']
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
+        z.writestr('Robotfile', json.dumps({
+            "version": "0.0.1",
+            "id": "2ae54a21-9605-4fb4-a980-222b87578493",
+            "name": "sample1",
+            "program": "workflow.xml"
+        }).encode('utf-8'))
+
+        z.writestr('workflow.xml', """
+        <?xml version="1.0" ?>
+        <Workflow>
+          <ImageMatch windowTitle="{title}" imagePath="{rect}" matchAction="LeftClick" />
+        </Workflow>
+        """.format(rect=rect, title=title).encode('utf-8'))
+
+        z.writestr('image.png', capture.read())
+
+    buf.seek(0)
+    return send_file(buf, attachment_filename='robot.zip', mimetype='application/zip')

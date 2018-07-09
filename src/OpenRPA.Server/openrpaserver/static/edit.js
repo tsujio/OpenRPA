@@ -168,4 +168,23 @@ $(() => {
 
     location.href = 'openrpa:capture/' + $(e.currentTarget).attr('data-token');
   });
+
+  $('#downloadButton').on('click', function() {
+    var fd = new FormData();
+    fd.append('capture', capture);
+    fd.append('rect', JSON.stringify(rect));
+    fd.append('title', title);
+
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState === 4 && this.status === 200) {
+        var z = new Blob([this.response], {type: 'application/zip'});
+
+        location.href = URL.createObjectURL(z);
+      }
+    };
+    xhr.open('POST', '/download');
+    xhr.responseType = 'blob';
+    xhr.send(fd);
+  });
 });
