@@ -1,5 +1,12 @@
 // TODO: use MVC library
 
+var rect = {
+  "top": 0,
+  "left": 0,
+  "right": 0,
+  "bottom": 0
+};
+
 $(() => {
   var nodeListSortable = sortable('.sidebar .node-list', {
     forcePlaceholderSize: true,
@@ -76,6 +83,29 @@ $(() => {
           canvas.height = img.height;
           ctx.drawImage(img, 0, 0);
 
+          if (startX !== undefined && startY !== undefined &&
+              endX !== undefined && endY !== undefined) {
+            ctx.strokeStyle = "#00ff00";
+            ctx.lineWidth = 5;
+            ctx.setLineDash([2, 3]);
+
+            ctx.beginPath();
+
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, startY);
+
+            ctx.moveTo(startX,endY);
+            ctx.lineTo(endX,endY);
+
+            ctx.moveTo(endX,startY);
+            ctx.lineTo(endX,endY);
+
+            ctx.moveTo(startX,startY);
+            ctx.lineTo(startX,endY);
+
+            ctx.stroke();
+          }
+
           $('.capture-image-modal').modal('show');
         }
         img.src = url;
@@ -123,6 +153,17 @@ $(() => {
         ctx.stroke();
       }).on('mouseup', function(e) {
         isMouseDown = false;
+      });
+
+      $('.capture-image-modal .save-button').on('click', function() {
+        rect = {
+          "top": startY,
+          "left": startX,
+          "right": endX,
+          "bottom": endY,
+        };
+
+        $('.capture-image-modal').modal('hide');
       });
     });
 
