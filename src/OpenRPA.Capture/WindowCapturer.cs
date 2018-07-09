@@ -79,6 +79,7 @@ namespace OpenRPA.Capture
                 using (var formData = new MultipartFormDataContent())
                 {
                     formData.Add(content, "capture", "capture.png");
+                    formData.Add(new StringContent(w.WindowTitle), "title");
 
                     var url = this.captureImageUploadUrl + "?token=" + this.uploadToken;
 

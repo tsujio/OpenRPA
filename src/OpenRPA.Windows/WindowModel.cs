@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -10,7 +11,23 @@ namespace OpenRPA.Windows
 {
     public class WindowModel
     {
-        private IntPtr hWnd;
+        private Process process;
+
+        private IntPtr HWnd
+        {
+            get
+            {
+                return this.process.MainWindowHandle;
+            }
+        }
+
+        public string WindowTitle
+        {
+            get
+            {
+                return this.process.MainWindowTitle;
+            }
+        }
 
         public static WindowModel FindByPosition(int x, int y)
         {
@@ -19,12 +36,16 @@ namespace OpenRPA.Windows
             {
                 throw new Exception($"Window at ({x}, {y}) not found");
             }
-            return new WindowModel(hWnd);
+
+            Win32.GetWindowThreadProcessId(hWnd, out uint pid);
+            var proc = Process.GetProcessById((int)pid);
+
+            return new WindowModel(proc);
         }
 
-        private WindowModel(IntPtr hWnd)
+        private WindowModel(Process process)
         {
-            this.hWnd = hWnd;
+            this.process = process;
         }
 
         internal void TryBringToForeground()
@@ -32,13 +53,13 @@ namespace OpenRPA.Windows
             // Reference: https://dobon.net/vb/dotnet/process/appactivate.html
 
             // Show window if minimized
-            if (Win32.IsIconic(this.hWnd))
+            if (Win32.IsIconic(this.HWnd))
             {
-                Win32.ShowWindowAsync(this.hWnd, Win32.SW_RESTORE);
+                Win32.ShowWindowAsync(this.HWnd, Win32.SW_RESTORE);
             }
 
             IntPtr hWnd = Win32.GetForegroundWindow();
-            if (hWnd == this.hWnd)
+            if (hWnd == this.HWnd)
             {
                 return;
             }
@@ -56,12 +77,12 @@ namespace OpenRPA.Windows
             }
 
             // Try bring window to foreground
-            Win32.SetForegroundWindow(this.hWnd);
-            Win32.SetWindowPos(this.hWnd, Win32.HWND_TOP, 0, 0, 0, 0,
+            Win32.SetForegroundWindow(this.HWnd);
+            Win32.SetWindowPos(this.HWnd, Win32.HWND_TOP, 0, 0, 0, 0,
                 Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_SHOWWINDOW | Win32.SWP_ASYNCWINDOWPOS);
-            Win32.BringWindowToTop(this.hWnd);
-            Win32.ShowWindowAsync(this.hWnd, Win32.SW_SHOW);
-            Win32.SetFocus(this.hWnd);
+            Win32.BringWindowToTop(this.HWnd);
+            Win32.ShowWindowAsync(this.HWnd, Win32.SW_SHOW);
+            Win32.SetFocus(this.HWnd);
 
             // Restore ForegroundLockTimeout
             if (foreThread != thisThread)
@@ -73,7 +94,7 @@ namespace OpenRPA.Windows
         public Rectangle GetRectangle()
         {
             Win32.RECT r;
-            if (!Win32.GetWindowRect(this.hWnd, out r))
+            if (!Win32.GetWindowRect(this.HWnd, out r))
             {
                 throw new Exception("Failed to get window rect");
             }

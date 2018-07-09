@@ -1,11 +1,6 @@
 // TODO: use MVC library
 
-var rect = {
-  "top": 0,
-  "left": 0,
-  "right": 0,
-  "bottom": 0
-};
+var capture, rect, title;
 
 $(() => {
   var nodeListSortable = sortable('.sidebar .node-list', {
@@ -59,7 +54,11 @@ $(() => {
     });
 
     socket.on('receive capture', function(msg) {
-      var blob = new Blob([msg.data], {type: 'image/png'});
+      var blob = new Blob([msg.capture], {type: 'image/png'});
+
+      capture = blob;
+      title = msg.title;
+
       var url = URL.createObjectURL(blob);
 
       $('.capture-image').attr('src', url);

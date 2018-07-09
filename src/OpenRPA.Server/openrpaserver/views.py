@@ -5,6 +5,7 @@ Routes and views for the flask application.
 import binascii
 from datetime import datetime
 import os
+import pickle
 import re
 from flask import request, render_template, session
 from flask_socketio import emit
@@ -65,13 +66,17 @@ def capture():
     """Window capture upload handler."""
     token = request.args['token']
     capture = request.files['capture']
+    title = request.form['title']
 
     if not re.match(r'^[\w-]+$', token):
         raise Exception("Invalid token format")
 
     channel = 'capture-' + token
     print('publish: ' + channel)
-    redis.publish(channel, capture.stream.read())
+    redis.publish(channel, pickle.dumps({
+        'capture': capture.stream.read(),
+        'title': title,
+    }))
 
     return 'OK', 200
 
@@ -85,6 +90,6 @@ def listen_capture():
     for item in pubsub.listen():
         print(item)
         if item['type'] == 'message':
-            emit('receive capture', {'data': item['data']})
+            emit('receive capture', pickle.loads(item['data']))
             pubsub.unsubscribe()
             break

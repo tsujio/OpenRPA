@@ -128,5 +128,7 @@ namespace OpenRPA.Windows
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
     }
 }
